@@ -10,12 +10,18 @@
 <body>
   <header>
     <h1>పోతన తెలుగు భాగవతము</h1>
-    <button id="menuBtn">☰</button>
+    <button id="menuBtn" aria-label="Open menu">☰</button>
   </header>
 
   <nav id="hamburgerMenu" class="hidden"></nav>
 
   <main id="cardContainer"></main>
+
+  <footer class="footer-nav">
+    <button id="prevBtn">◀ Previous</button>
+    <button id="bookmarkBtn">🔖 Bookmark</button>
+    <button id="nextBtn">Next ▶</button>
+  </footer>
 
   <script src="db.js"></script>
   <script src="ui.js"></script>

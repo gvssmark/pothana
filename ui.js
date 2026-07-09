@@ -15,6 +15,7 @@ function renderCard(row) {
   `;
 }
 
+
 function showCard(index) {
   if (index >= 0 && index < data.length) {
     currentIndex = index;

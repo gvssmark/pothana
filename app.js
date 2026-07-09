@@ -5,17 +5,19 @@ async function fetchData() {
   const res = await fetch(url);
   const json = await res.json(); // array of arrays
 
-  // normalize
+  // skip header row
   data = json.slice(1).map((row, i) => ({
     id: i,
-    skandhamu: row[1] || "",   // Column 2
-    ghattamu: row[3] || "",    // Column 4
-    pasam: row[6] || "",       // Column 7
-    padyam: row[7] || "",      // Column 8
-    teeka: row[8] || "",       // Column 9
-    tippani: row[9] || ""      // Column 10
+    skandhamu: row[1] || "",
+    ghattamu: row[3] || "",
+    pasam: row[6] || "",
+    padyam: row[7] || "",
+    teeka: row[8] || "",
+    tippani: row[9] || ""
   }));
 
+  console.log("Mapped first row:", data[0]); // debug
   await saveRows(data);
 }
+
 

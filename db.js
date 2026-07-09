@@ -32,6 +32,19 @@ async function saveRows(rows) {
   });
 }
 
+async function getAllRows() {
+  const db = await openDB();
+
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, "readonly");
+    const store = tx.objectStore(STORE_NAME);
+    const req = store.getAll();
+
+    req.onsuccess = () => resolve(req.result || []);
+    req.onerror = () => reject(req.error);
+  });
+}
+
 async function getRow(id) {
   const db = await openDB();
 

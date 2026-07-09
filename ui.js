@@ -3,6 +3,12 @@ let data = [];
 
 function renderCard(row) {
   const container = document.getElementById("cardContainer");
+
+  if (!row) {
+    container.innerHTML = `<div class="card"><p>No card found.</p></div>`;
+    return;
+  }
+
   container.innerHTML = `
     <div class="card">
       <h2>${row.skandhamu} – ${row.ghattamu} – ${row.pasam}</h2>
@@ -15,21 +21,31 @@ function renderCard(row) {
   `;
 }
 
-
 function showCard(index) {
   if (index >= 0 && index < data.length) {
     currentIndex = index;
     renderCard(data[index]);
     localStorage.setItem("bookmark", index);
+    updateNavButtons();
   }
 }
 
-function initSwipe() {
-  let startY = 0;
-  document.body.addEventListener("touchstart", e => startY = e.touches[0].clientY);
-  document.body.addEventListener("touchend", e => {
-    let endY = e.changedTouches[0].clientY;
-    if (startY - endY > 50) showCard(currentIndex + 1); // swipe up
-    else if (endY - startY > 50) showCard(currentIndex - 1); // swipe down
+function updateNavButtons() {
+  document.getElementById("prevBtn").disabled = currentIndex <= 0;
+  document.getElementById("nextBtn").disabled = currentIndex >= data.length - 1;
+}
+
+function initButtons() {
+  document.getElementById("prevBtn").addEventListener("click", () => {
+    showCard(currentIndex - 1);
+  });
+
+  document.getElementById("nextBtn").addEventListener("click", () => {
+    showCard(currentIndex + 1);
+  });
+
+  document.getElementById("bookmarkBtn").addEventListener("click", () => {
+    localStorage.setItem("bookmark", currentIndex);
+    alert(`Bookmarked card ${currentIndex + 1}`);
   });
 }

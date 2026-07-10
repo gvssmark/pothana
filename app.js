@@ -1,5 +1,3 @@
-//https://script.google.com/macros/s/AKfycbwo-TtPn3DAjHSPCXDwPFerT36QyfPPvUTi7uQEvcmjJso_aWpaKefUsgx_vpJOowHUgg/exec?sheetid=1azp8o_KQvmWNLPeiRK75JBY2Hu8DMY7wJYoWX_1WdWs&sheetname=Sheet1
-
 const SHEET_URL = "https://script.google.com/macros/s/AKfycbwo-TtPn3DAjHSPCXDwPFerT36QyfPPvUTi7uQEvcmjJso_aWpaKefUsgx_vpJOowHUgg/exec?sheetid=1azp8o_KQvmWNLPeiRK75JBY2Hu8DMY7wJYoWX_1WdWs&sheetname=Sheet1";
 
 function mapRows(json) {
@@ -14,53 +12,99 @@ function mapRows(json) {
   }));
 }
 
-async function loadFromIndexedDB() {
-  try {
-    const cachedRows = await getAllRows();
-
-    if (cachedRows.length > 0) {
-      data = cachedRows;
-      const savedBookmark = parseInt(localStorage.getItem("bookmark"), 10);
-      const startIndex = Number.isInteger(savedBookmark) ? savedBookmark : 0;
-      showCard(startIndex);
-      return true;
-    }
-  } catch (err) {
-    console.error("IndexedDB load error:", err);
-  }
-
-  return false;
+function dataSignature(rows) {
+  return JSON.stringify(rows.map(r => [r.skandhamu, r.ghattamu, r.pasam, r.padyam, r.teeka, r.tippani]));
 }
 
-async function refreshFromServer() {
+function resolveReadingIndex(savedPosition, rows) {
+  if (!savedPosition || !rows.length) return 0;
+  if (savedPosition.key) {
+    const idx = rows.findIndex(r => positionKey(r) === savedPosition.key);
+    if (idx !== -1) return idx;
+  }
+  if (typeof savedPosition.index === "number" && savedPosition.index >= 0 && savedPosition.index < rows.length) {
+    return savedPosition.index;
+  }
+  return 0;
+}
+
+async function loadPrefs() {
+  const savedPrefs = await getMeta("uiPrefs");
+  if (savedPrefs) {
+    uiPrefs = {
+      meaningExpanded: savedPrefs.meaningExpanded !== false,
+      bhavamExpanded: savedPrefs.bhavamExpanded !== false
+    };
+  }
+}
+
+async function loadFromIndexedDB() {
+  const cachedRows = await getAllRows();
+  if (!cachedRows.length) return false;
+
+  data = cachedRows;
+  buildHomeTree();
+  const savedPosition = await getMeta("readingPosition");
+  const startIndex = resolveReadingIndex(savedPosition, data);
+  showCard(startIndex);
+  return true;
+}
+
+async function refreshFromServer(manual = false) {
   try {
     const res = await fetch(SHEET_URL);
     const json = await res.json();
     const freshRows = mapRows(json);
+    if (!freshRows.length) return;
 
-    if (freshRows.length > 0) {
-      data = freshRows;
-      await saveRows(freshRows);
+    const oldSig = dataSignature(data);
+    const newSig = dataSignature(freshRows);
+    const savedPosition = await getMeta("readingPosition");
 
-      const savedBookmark = parseInt(localStorage.getItem("bookmark"), 10);
-      const startIndex = Number.isInteger(savedBookmark) ? savedBookmark : 0;
-      showCard(startIndex);
+    data = freshRows;
+    await replaceRows(freshRows);
+    buildHomeTree();
+
+    const startIndex = resolveReadingIndex(savedPosition, data);
+    showCard(startIndex);
+
+    if (oldSig && oldSig !== newSig) {
+      showStatus("Content refreshed from source");
+    } else if (manual) {
+      showStatus("Already up to date");
     }
   } catch (err) {
-    console.error("Server refresh failed:", err);
+    console.error("Refresh failed:", err);
+    if (manual) showStatus("Refresh failed");
+  }
+}
+
+function registerServiceWorker() {
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./sw.js").catch(err => console.error("SW registration failed:", err));
   }
 }
 
 window.addEventListener("load", async () => {
-  initButtons();
+  initUIEvents(refreshFromServer);
+  await loadPrefs();
 
-  const hasCache = await loadFromIndexedDB();
+  let hasCache = false;
+  try {
+    hasCache = await loadFromIndexedDB();
+  } catch (err) {
+    console.error("IndexedDB load error:", err);
+  }
 
   if (!hasCache) {
     document.getElementById("cardContainer").innerHTML = `
-      <div class="card"><p>Loading...</p></div>
+      <article class="card">
+        <div class="card-head"><h4>Loading</h4></div>
+        <div class="card-body"><p>Loading content...</p></div>
+      </article>
     `;
   }
 
-  refreshFromServer();
+  await refreshFromServer(false);
+  registerServiceWorker();
 });

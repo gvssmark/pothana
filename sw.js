@@ -1,13 +1,14 @@
 self.addEventListener("install", event => {
   event.waitUntil(
-    caches.open("pothana-cache-v2").then(cache => cache.addAll([
+    caches.open("pothana-cache-v3").then(cache => cache.addAll([
       "./",
       "./index.html",
       "./styles.css",
       "./app.js",
       "./ui.js",
       "./db.js",
-      "./manifest.json"
+      "./manifest.json",
+      "./data.js"
     ]))
   );
 });

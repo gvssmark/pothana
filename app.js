@@ -129,6 +129,6 @@ window.addEventListener("load", async () => {
     `;
   }
 
-  await refreshFromServer(false);
+ // await refreshFromServer(false);
   registerServiceWorker();
 });

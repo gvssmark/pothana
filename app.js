@@ -85,6 +85,22 @@ function registerServiceWorker() {
   }
 }
 
+async function loadFromBundledData() {
+  if (typeof LOCAL_DATA === "undefined" || !LOCAL_DATA.length) return false;
+
+  const rows = mapRows(LOCAL_DATA);
+  if (!rows.length) return false;
+
+  data = rows;
+  await replaceRows(rows);
+  buildHomeTree();
+
+  const savedPosition = await getMeta("readingPosition");
+  const startIndex = resolveReadingIndex(savedPosition, data);
+  showCard(startIndex);
+  return true;
+}
+
 window.addEventListener("load", async () => {
   initUIEvents(refreshFromServer);
   await loadPrefs();
@@ -94,6 +110,14 @@ window.addEventListener("load", async () => {
     hasCache = await loadFromIndexedDB();
   } catch (err) {
     console.error("IndexedDB load error:", err);
+  }
+
+  if (!hasCache) {
+    try {
+      hasCache = await loadFromBundledData();
+    } catch (err) {
+      console.error("Bundled data load error:", err);
+    }
   }
 
   if (!hasCache) {

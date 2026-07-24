@@ -177,6 +177,164 @@ function closeAbout() {
   document.getElementById("aboutScreen").classList.add("hidden");
 }
 
+const MIN_SEARCH_CHARS = 3;
+const SEARCH_RESULT_CAP = 200;
+
+let searchState = {
+  query: "",
+  scope: "all",
+  results: []
+};
+let searchDebounceTimer = null;
+
+function stripNewlines(str = "") {
+  return String(str).replace(/\r\n|\r|\n/g, " ");
+}
+
+function buildSnippet(text, query, radius = 60) {
+  const clean = stripNewlines(text).trim();
+  const idx = clean.toLowerCase().indexOf(query.toLowerCase());
+
+  if (idx === -1) {
+    const short = clean.slice(0, radius * 2);
+    return escapeHtml(short) + (clean.length > radius * 2 ? "…" : "");
+  }
+
+  const start = Math.max(0, idx - radius);
+  const end = Math.min(clean.length, idx + query.length + radius);
+  const before = clean.slice(start, idx);
+  const match = clean.slice(idx, idx + query.length);
+  const after = clean.slice(idx + query.length, end);
+
+  const prefix = start > 0 ? "…" : "";
+  const suffix = end < clean.length ? "…" : "";
+
+  return prefix + escapeHtml(before) + `<mark>${escapeHtml(match)}</mark>` + escapeHtml(after) + suffix;
+}
+
+function runSearch(query, scope) {
+  searchState.query = query;
+  searchState.scope = scope;
+
+  const q = query.trim();
+  if (q.length < MIN_SEARCH_CHARS) {
+    searchState.results = [];
+    renderSearchResults();
+    return;
+  }
+
+  const fields = scope === "all" ? ["padyam", "teeka", "tippani"] : [scope];
+  const qLower = q.toLowerCase();
+  const results = [];
+
+  for (let i = 0; i < data.length; i++) {
+    const row = data[i];
+    for (const field of fields) {
+      const text = row[field] || "";
+      if (text.toLowerCase().includes(qLower)) {
+        results.push({ index: i, row, snippet: buildSnippet(text, q) });
+        break;
+      }
+    }
+    if (results.length >= SEARCH_RESULT_CAP) break;
+  }
+
+  searchState.results = results;
+  renderSearchResults();
+}
+
+function renderSearchResults() {
+  const container = document.getElementById("searchResults");
+  if (!container) return;
+
+  const q = searchState.query.trim();
+
+  if (!q) {
+    container.innerHTML = `<p class="search-hint">వెతకడానికి కనీసం ${MIN_SEARCH_CHARS} అక్షరాలు టైప్ చేయండి.</p>`;
+    return;
+  }
+
+  if (q.length < MIN_SEARCH_CHARS) {
+    container.innerHTML = `<p class="search-hint">మరిన్ని అక్షరాలు టైప్ చేయండి... (కనీసం ${MIN_SEARCH_CHARS})</p>`;
+    return;
+  }
+
+  if (!searchState.results.length) {
+    container.innerHTML = `<p class="search-hint">ఫలితాలు కనబడలేదు.</p>`;
+    return;
+  }
+
+  const items = searchState.results.map(r => `
+    <button class="search-result-item" data-index="${r.index}">
+      <div class="search-result-head">${escapeHtml(r.row.skandhamu)} – ${escapeHtml(r.row.ghattamu)} – ${escapeHtml(r.row.pasam)}</div>
+      <div class="search-result-snippet">${r.snippet}</div>
+    </button>
+    <hr class="search-result-divider">
+  `).join("");
+
+  const capNote = searchState.results.length >= SEARCH_RESULT_CAP
+    ? `<p class="search-hint">తొలి ${SEARCH_RESULT_CAP} ఫలితాలు చూపిస్తున్నాం. మరింత నిర్దిష్టంగా వెతకండి.</p>`
+    : "";
+
+  container.innerHTML = items + capNote;
+
+  container.querySelectorAll(".search-result-item").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const index = parseInt(btn.dataset.index, 10);
+      showCard(index);
+      closeSearch();
+    });
+  });
+}
+
+function onSearchInput(e) {
+  const query = e.target.value;
+  clearTimeout(searchDebounceTimer);
+  searchDebounceTimer = setTimeout(() => {
+    runSearch(query, searchState.scope);
+  }, 150);
+}
+
+function bindSearchScopeChips() {
+  document.querySelectorAll(".scope-chip").forEach(chip => {
+    chip.addEventListener("click", () => {
+      document.querySelectorAll(".scope-chip").forEach(c => c.classList.remove("active"));
+      chip.classList.add("active");
+      runSearch(searchState.query, chip.dataset.scope);
+    });
+  });
+}
+
+function openSearch() {
+  document.getElementById("searchScreen").classList.remove("hidden");
+  document.getElementById("searchScreen").setAttribute("aria-hidden", "false");
+
+  const input = document.getElementById("searchInput");
+  if (input && input.value !== searchState.query) {
+    input.value = searchState.query;
+  }
+  renderSearchResults();
+  if (input) setTimeout(() => input.focus(), 50);
+}
+
+function closeSearch() {
+  document.getElementById("searchScreen").classList.add("hidden");
+  document.getElementById("searchScreen").setAttribute("aria-hidden", "true");
+}
+
+function clearSearch() {
+  searchState = { query: "", scope: "all", results: [] };
+
+  const input = document.getElementById("searchInput");
+  if (input) input.value = "";
+
+  document.querySelectorAll(".scope-chip").forEach(chip => {
+    chip.classList.toggle("active", chip.dataset.scope === "all");
+  });
+
+  renderSearchResults();
+}
+
 function hideSplash() {
   document.getElementById("splashScreen").classList.add("hidden");
 }
@@ -208,6 +366,11 @@ function initUIEvents(refreshHandler) {
   });
   document.getElementById("closeAboutBtn").addEventListener("click", closeAbout);
   document.getElementById("startBtn").addEventListener("click", hideSplash);
+  document.getElementById("searchBtn").addEventListener("click", openSearch);
+  document.getElementById("closeSearchBtn").addEventListener("click", closeSearch);
+  document.getElementById("clearSearchBtn").addEventListener("click", clearSearch);
+  document.getElementById("searchInput").addEventListener("input", onSearchInput);
+  bindSearchScopeChips();
   document.getElementById("refreshBtn").addEventListener("click", async () => {
     closeMenu();
     await refreshHandler(true);

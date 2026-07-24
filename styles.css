@@ -33,6 +33,12 @@ button {
   font-size: 20px;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .icon-btn, .panel-btn, .primary-btn, .toggle-btn, .footer-nav button, .ghatta-btn {
   cursor: pointer;
 }
@@ -290,6 +296,136 @@ button {
 
 .hidden {
   display: none !important;
+}
+
+.search-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 1450;
+  background: #fff;
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.search-screen-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: #673ab7;
+  color: #fff;
+  flex: 0 0 auto;
+}
+
+.search-screen-header h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.search-controls {
+  padding: 12px 16px;
+  border-bottom: 1px solid #eee;
+  flex: 0 0 auto;
+}
+
+.search-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-input {
+  width: 100%;
+  padding: 11px 40px 11px 12px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+.search-clear-btn {
+  position: absolute;
+  right: 2px;
+  font-size: 16px;
+  color: #888;
+  padding: 8px;
+}
+
+.search-scope {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  overflow-x: auto;
+}
+
+.scope-chip {
+  border: 1px solid #d8c8ff;
+  background: #faf7ff;
+  color: #52309e;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 14px;
+  white-space: nowrap;
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+
+.scope-chip.active {
+  background: #673ab7;
+  color: #fff;
+  border-color: #673ab7;
+}
+
+.search-results {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 4px 16px calc(24px + env(safe-area-inset-bottom, 0px));
+}
+
+.search-result-item {
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  padding: 12px 0;
+  cursor: pointer;
+  display: block;
+}
+
+.search-result-head {
+  font-weight: 700;
+  color: #673ab7;
+  margin-bottom: 4px;
+  font-size: 15px;
+}
+
+.search-result-snippet {
+  color: #444;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.search-result-snippet mark {
+  background: #ffe082;
+  color: #222;
+  padding: 0 2px;
+  border-radius: 3px;
+}
+
+.search-result-divider {
+  border: none;
+  border-top: 1px solid #eee;
+  margin: 0;
+}
+
+.search-hint {
+  color: #777;
+  padding: 24px 0;
+  text-align: center;
+  font-size: 14px;
 }
 
 @media (max-width: 600px) {

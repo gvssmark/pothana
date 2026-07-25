@@ -146,8 +146,8 @@ function showCard(index, options = {}) {
 }
 
 function updateNavButtons() {
-  document.getElementById("prevBtn").disabled = isPreviewMode || currentIndex <= 0;
-  document.getElementById("nextBtn").disabled = isPreviewMode || currentIndex >= data.length - 1;
+  document.getElementById("prevBtn").disabled = currentIndex <= 0;
+  document.getElementById("nextBtn").disabled = currentIndex >= data.length - 1;
 }
 
 function buildHomeTree() {
@@ -420,8 +420,8 @@ function showStatus(message) {
 }
 
 function initUIEvents(refreshHandler) {
-  document.getElementById("prevBtn").addEventListener("click", () => showCard(currentIndex - 1));
-  document.getElementById("nextBtn").addEventListener("click", () => showCard(currentIndex + 1));
+  document.getElementById("prevBtn").addEventListener("click", () => showCard(currentIndex - 1, { persist: !isPreviewMode }));
+  document.getElementById("nextBtn").addEventListener("click", () => showCard(currentIndex + 1, { persist: !isPreviewMode }));
   document.getElementById("homeBtn").addEventListener("click", openMenu);
   document.getElementById("menuBtn").addEventListener("click", openMenu);
   document.getElementById("closeMenuBtn").addEventListener("click", closeMenu);

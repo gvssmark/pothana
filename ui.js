@@ -390,8 +390,19 @@ function clearSearch() {
   renderSearchResults();
 }
 
+async function checkSearchAnnouncement() {
+  try {
+    const seen = await getMeta("searchAnnouncementSeen");
+    const el = document.getElementById("searchAnnouncement");
+    if (el) el.classList.toggle("hidden", !!seen);
+  } catch (err) {
+    console.error("Check announcement failed:", err);
+  }
+}
+
 function hideSplash() {
   document.getElementById("splashScreen").classList.add("hidden");
+  saveMeta("searchAnnouncementSeen", true).catch(err => console.error("Save announcement flag failed:", err));
 }
 
 function showStatus(message) {

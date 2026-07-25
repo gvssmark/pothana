@@ -323,6 +323,25 @@ button {
   display: none !important;
 }
 
+@keyframes flashPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+.flash-announcement {
+  color: #d81b60;
+  font-weight: 700;
+  text-align: center;
+  animation: flashPulse 1.2s ease-in-out infinite;
+  margin: 0 0 14px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flash-announcement {
+    animation: none;
+  }
+}
+
 .search-screen {
   position: fixed;
   inset: 0;

@@ -104,6 +104,7 @@ async function loadFromBundledData() {
 window.addEventListener("load", async () => {
   initUIEvents(refreshFromServer);
   await loadPrefs();
+  await checkSearchAnnouncement();
 
   let hasCache = false;
   try {

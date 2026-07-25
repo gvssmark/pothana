@@ -1,6 +1,6 @@
 self.addEventListener("install", event => {
   event.waitUntil(
-    caches.open("pothana-cache-v5").then(cache => cache.addAll([
+    caches.open("pothana-cache-v8").then(cache => cache.addAll([
       "./",
       "./index.html",
       "./styles.css",

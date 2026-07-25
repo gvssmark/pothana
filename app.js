@@ -129,6 +129,8 @@ window.addEventListener("load", async () => {
     `;
   }
 
+  await restoreSearchState();
+
  // await refreshFromServer(false);
   registerServiceWorker();
 });

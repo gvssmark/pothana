@@ -1,5 +1,6 @@
 let currentIndex = 0;
 let data = [];
+let isPreviewMode = false;
 let uiPrefs = {
   meaningExpanded: true,
   bhavamExpanded: true
@@ -39,6 +40,12 @@ function renderCard(row) {
   container.innerHTML = `
     <article class="card">
       <div class="card-head">
+        ${isPreviewMode ? `
+          <div class="preview-banner">
+            <span>సెర్చ్ ఫలితం చూస్తున్నారు</span>
+            <button id="backToPlaceBtn" class="back-to-place-btn">↩ Back to my place</button>
+          </div>
+        ` : ""}
         <h4>${escapeHtml(row.skandhamu)} – ${escapeHtml(row.ghattamu)} – ${escapeHtml(row.pasam)}</h4>
       </div>
       <div id="cardBody" class="card-body">
@@ -66,7 +73,23 @@ function renderCard(row) {
   `;
 
   bindCardToggles();
+  bindBackToPlaceButton();
   scrollCardBodyToTop();
+}
+
+async function bindBackToPlaceButton() {
+  const btn = document.getElementById("backToPlaceBtn");
+  if (!btn) return;
+
+  btn.addEventListener("click", async () => {
+    try {
+      const savedPosition = await getMeta("readingPosition");
+      const targetIndex = resolveReadingIndex(savedPosition, data);
+      showCard(targetIndex, { persist: true });
+    } catch (err) {
+      console.error("Back to my place failed:", err);
+    }
+  });
 }
 
 function bindCardToggles() {
@@ -103,22 +126,28 @@ function scrollCardBodyToTop() {
   }
 }
 
-function showCard(index) {
+function showCard(index, options = {}) {
+  const persist = options.persist !== false;
+
   if (index >= 0 && index < data.length) {
     currentIndex = index;
+    isPreviewMode = !persist;
     const row = data[index];
     renderCard(row);
     updateNavButtons();
-    saveMeta("readingPosition", {
-      index,
-      key: positionKey(row)
-    });
+
+    if (persist) {
+      saveMeta("readingPosition", {
+        index,
+        key: positionKey(row)
+      });
+    }
   }
 }
 
 function updateNavButtons() {
-  document.getElementById("prevBtn").disabled = currentIndex <= 0;
-  document.getElementById("nextBtn").disabled = currentIndex >= data.length - 1;
+  document.getElementById("prevBtn").disabled = isPreviewMode || currentIndex <= 0;
+  document.getElementById("nextBtn").disabled = isPreviewMode || currentIndex >= data.length - 1;
 }
 
 function buildHomeTree() {
@@ -212,9 +241,15 @@ function buildSnippet(text, query, radius = 60) {
   return prefix + escapeHtml(before) + `<mark>${escapeHtml(match)}</mark>` + escapeHtml(after) + suffix;
 }
 
+function persistSearchMeta() {
+  saveMeta("lastSearch", { query: searchState.query, scope: searchState.scope })
+    .catch(err => console.error("Save search meta failed:", err));
+}
+
 function runSearch(query, scope) {
   searchState.query = query;
   searchState.scope = scope;
+  persistSearchMeta();
 
   const q = query.trim();
   if (q.length < MIN_SEARCH_CHARS) {
@@ -281,7 +316,7 @@ function renderSearchResults() {
   container.querySelectorAll(".search-result-item").forEach(btn => {
     btn.addEventListener("click", () => {
       const index = parseInt(btn.dataset.index, 10);
-      showCard(index);
+      showCard(index, { persist: false });
       closeSearch();
     });
   });
@@ -303,6 +338,25 @@ function bindSearchScopeChips() {
       runSearch(searchState.query, chip.dataset.scope);
     });
   });
+}
+
+async function restoreSearchState() {
+  try {
+    const saved = await getMeta("lastSearch");
+    if (!saved || !saved.query) return;
+
+    searchState.scope = saved.scope || "all";
+    document.querySelectorAll(".scope-chip").forEach(chip => {
+      chip.classList.toggle("active", chip.dataset.scope === searchState.scope);
+    });
+
+    const input = document.getElementById("searchInput");
+    if (input) input.value = saved.query;
+
+    runSearch(saved.query, searchState.scope);
+  } catch (err) {
+    console.error("Restore search state failed:", err);
+  }
 }
 
 function openSearch() {
@@ -332,6 +386,7 @@ function clearSearch() {
     chip.classList.toggle("active", chip.dataset.scope === "all");
   });
 
+  persistSearchMeta();
   renderSearchResults();
 }
 

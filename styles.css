@@ -91,8 +91,8 @@ button {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  background: #fff3cd;
-  color: #7a5900;
+  background: red;
+  color: white;
   padding: 7px 10px;
   border-radius: 8px;
   margin-bottom: 8px;

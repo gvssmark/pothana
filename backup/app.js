@@ -33,11 +33,9 @@ async function loadPrefs() {
   if (savedPrefs) {
     uiPrefs = {
       meaningExpanded: savedPrefs.meaningExpanded !== false,
-      bhavamExpanded: savedPrefs.bhavamExpanded !== false,
-      fontScale: typeof savedPrefs.fontScale === "number" ? savedPrefs.fontScale : 1
+      bhavamExpanded: savedPrefs.bhavamExpanded !== false
     };
   }
-  applyFontScale();
 }
 
 async function loadFromIndexedDB() {

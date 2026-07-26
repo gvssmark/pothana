@@ -7,13 +7,8 @@ html, body {
   overscroll-behavior-y: contain;
 }
 
-:root {
-  --font-scale: 1;
-}
-
 body {
   color: #222;
-  font-size: calc(16px * var(--font-scale));
 }
 
 button {
@@ -82,7 +77,7 @@ button {
 
 .card-head h4 {
   margin: 0;
-  font-size: calc(18px * var(--font-scale));
+  font-size: 18px;
   line-height: 1.4;
 }
 
@@ -91,12 +86,13 @@ button {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  background: #fff3cd;
+  background: red;
   color: #7a5900;
   padding: 7px 10px;
   border-radius: 8px;
   margin-bottom: 8px;
   font-size: 13px;
+  color:white;	
 }
 
 .back-to-place-btn {
@@ -118,7 +114,7 @@ button {
 }
 
 .padyam {
-  font-size: calc(18px * var(--font-scale));
+  font-size: 18px;
   line-height: 1.8;
   white-space: normal;
 }
@@ -289,6 +285,7 @@ button {
   background: #fff;
   border-radius: 16px;
   padding: 20px;
+  font-size:small;
   box-shadow: 0 10px 30px rgba(0,0,0,0.25);
 }
 
@@ -326,41 +323,6 @@ button {
 
 .hidden {
   display: none !important;
-}
-
-.font-size-control {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  background: #faf7ff;
-  border: 1px solid #e4d7ff;
-  border-radius: 10px;
-  padding: 10px 14px;
-}
-
-.font-size-btn {
-  border: none;
-  background: #673ab7;
-  color: #fff;
-  border-radius: 8px;
-  padding: 8px 14px;
-  font-size: 16px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.font-size-btn:disabled {
-  background: #c9b8ea;
-  cursor: default;
-}
-
-.font-size-label {
-  font-size: 14px;
-  color: #52309e;
-  font-weight: 600;
-  min-width: 44px;
-  text-align: center;
 }
 
 @keyframes flashPulse {
@@ -526,10 +488,10 @@ button {
   }
 
   .card-head h4 {
-    font-size: calc(16px * var(--font-scale));
+    font-size: 16px;
   }
 
   .padyam {
-    font-size: calc(16px * var(--font-scale));
+    font-size: 16px;
   }
 }

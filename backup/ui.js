@@ -3,32 +3,8 @@ let data = [];
 let isPreviewMode = false;
 let uiPrefs = {
   meaningExpanded: true,
-  bhavamExpanded: true,
-  fontScale: 1
+  bhavamExpanded: true
 };
-
-const FONT_SCALE_MIN = 0.85;
-const FONT_SCALE_MAX = 1.6;
-const FONT_SCALE_STEP = 0.15;
-
-function applyFontScale() {
-  document.documentElement.style.setProperty("--font-scale", uiPrefs.fontScale);
-
-  const label = document.getElementById("fontSizeLabel");
-  if (label) label.textContent = `${Math.round(uiPrefs.fontScale * 100)}%`;
-
-  const decBtn = document.getElementById("fontDecreaseBtn");
-  const incBtn = document.getElementById("fontIncreaseBtn");
-  if (decBtn) decBtn.disabled = uiPrefs.fontScale <= FONT_SCALE_MIN;
-  if (incBtn) incBtn.disabled = uiPrefs.fontScale >= FONT_SCALE_MAX;
-}
-
-async function stepFontSize(delta) {
-  const next = Math.min(FONT_SCALE_MAX, Math.max(FONT_SCALE_MIN, uiPrefs.fontScale + delta));
-  uiPrefs.fontScale = Math.round(next * 100) / 100;
-  applyFontScale();
-  await saveMeta("uiPrefs", uiPrefs);
-}
 
 function escapeHtml(str = "") {
   return String(str)
@@ -461,8 +437,6 @@ function initUIEvents(refreshHandler) {
   document.getElementById("clearSearchBtn").addEventListener("click", clearSearch);
   document.getElementById("searchInput").addEventListener("input", onSearchInput);
   bindSearchScopeChips();
-  document.getElementById("fontDecreaseBtn").addEventListener("click", () => stepFontSize(-FONT_SCALE_STEP));
-  document.getElementById("fontIncreaseBtn").addEventListener("click", () => stepFontSize(FONT_SCALE_STEP));
   document.getElementById("refreshBtn").addEventListener("click", async () => {
     closeMenu();
     await refreshHandler(true);

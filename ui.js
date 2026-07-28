@@ -244,23 +244,79 @@ function stripNewlines(str = "") {
   return String(str).replace(/\r\n|\r|\n/g, " ");
 }
 
+function getGraphemeSegmenter() {
+  if (typeof Intl !== "undefined" && typeof Intl.Segmenter === "function") {
+    if (!getGraphemeSegmenter._instance) {
+      getGraphemeSegmenter._instance = new Intl.Segmenter(undefined, { granularity: "grapheme" });
+    }
+    return getGraphemeSegmenter._instance;
+  }
+  return null;
+}
+
+// Returns the code-unit offsets where each grapheme cluster starts (plus the
+// string length as a final boundary), or null if Intl.Segmenter isn't available.
+function graphemeBoundaries(str) {
+  const segmenter = getGraphemeSegmenter();
+  if (!segmenter) return null;
+
+  const boundaries = [];
+  for (const s of segmenter.segment(str)) boundaries.push(s.index);
+  boundaries.push(str.length);
+  return boundaries;
+}
+
+// Snaps a raw code-unit position to the nearest complete grapheme boundary,
+// so we never cut a base consonant apart from its combining vowel sign.
+function snapToBoundary(boundaries, pos, direction) {
+  if (!boundaries) return pos; // no Intl.Segmenter support: fall back to raw position
+
+  if (direction === "down") {
+    let result = 0;
+    for (const b of boundaries) {
+      if (b <= pos) result = b; else break;
+    }
+    return result;
+  }
+
+  for (const b of boundaries) {
+    if (b >= pos) return b;
+  }
+  return boundaries[boundaries.length - 1];
+}
+
 function buildSnippet(text, query, radius = 60) {
   const clean = stripNewlines(text).trim();
   const idx = clean.toLowerCase().indexOf(query.toLowerCase());
 
   if (idx === -1) {
-    const short = clean.slice(0, radius * 2);
-    return escapeHtml(short) + (clean.length > radius * 2 ? "…" : "");
+    const boundaries = graphemeBoundaries(clean.slice(0, radius * 2 + 20));
+    const cutAt = snapToBoundary(boundaries, radius * 2, "down");
+    const short = clean.slice(0, cutAt);
+    return escapeHtml(short) + (clean.length > cutAt ? "…" : "");
   }
 
-  const start = Math.max(0, idx - radius);
-  const end = Math.min(clean.length, idx + query.length + radius);
-  const before = clean.slice(start, idx);
-  const match = clean.slice(idx, idx + query.length);
-  const after = clean.slice(idx + query.length, end);
+  // Segment only a local window around the match, not the whole field —
+  // keeps this fast even for long meaning/bhavam paragraphs.
+  const windowStart = Math.max(0, idx - radius - 10);
+  const windowEnd = Math.min(clean.length, idx + query.length + radius + 10);
+  const windowStr = clean.slice(windowStart, windowEnd);
+  const boundaries = graphemeBoundaries(windowStr);
 
-  const prefix = start > 0 ? "…" : "";
-  const suffix = end < clean.length ? "…" : "";
+  const localIdx = idx - windowStart;
+  const localMatchEnd = localIdx + query.length;
+
+  const matchStart = snapToBoundary(boundaries, localIdx, "down");
+  const matchEnd = snapToBoundary(boundaries, localMatchEnd, "up");
+  const start = snapToBoundary(boundaries, Math.max(0, localIdx - radius), "down");
+  const end = snapToBoundary(boundaries, Math.min(windowStr.length, localMatchEnd + radius), "up");
+
+  const before = windowStr.slice(start, matchStart);
+  const match = windowStr.slice(matchStart, matchEnd);
+  const after = windowStr.slice(matchEnd, end);
+
+  const prefix = (windowStart + start) > 0 ? "…" : "";
+  const suffix = (windowStart + end) < clean.length ? "…" : "";
 
   return prefix + escapeHtml(before) + `<mark>${escapeHtml(match)}</mark>` + escapeHtml(after) + suffix;
 }

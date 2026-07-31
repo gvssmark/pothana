@@ -1,5 +1,47 @@
 const SHEET_URL = "https://script.google.com/macros/s/AKfycbwo-TtPn3DAjHSPCXDwPFerT36QyfPPvUTi7uQEvcmjJso_aWpaKefUsgx_vpJOowHUgg/exec?sheetid=1azp8o_KQvmWNLPeiRK75JBY2Hu8DMY7wJYoWX_1WdWs&sheetname=Sheet1";
 
+// TODO: replace with your deployed usage-log Web App URL (ends in /exec)
+const USAGE_LOG_URL = "https://script.google.com/macros/s/AKfycbwCInJnUidXP2-tlaF-9X8iEoCmyooNjhCFSLrauCh_pPJPtscLion32TDZ01ATi2BI/exec";
+
+async function getOrCreateDeviceId() {
+  let deviceId = await getMeta("deviceId");
+  if (!deviceId) {
+    deviceId = (crypto.randomUUID ? crypto.randomUUID() : `dev-${Date.now()}-${Math.random().toString(16).slice(2)}`);
+    await saveMeta("deviceId", deviceId);
+  }
+  return deviceId;
+}
+
+function detectStandalone() {
+  const isDisplayModeStandalone = window.matchMedia && window.matchMedia("(display-mode: standalone)").matches;
+  const isIosStandalone = window.navigator && window.navigator.standalone === true;
+  return (isDisplayModeStandalone || isIosStandalone) ? "yes" : "no";
+}
+
+function detectPlatform() {
+  return (navigator.userAgent || "unknown").slice(0, 150);
+}
+
+async function logUsage() {
+  if (!USAGE_LOG_URL || USAGE_LOG_URL.indexOf("PASTE_") === 0) return; // not configured yet
+
+  try {
+    const deviceId = await getOrCreateDeviceId();
+    const params = new URLSearchParams({
+      deviceId,
+      platform: detectPlatform(),
+      standalone: detectStandalone()
+    });
+    // no-cors: fire-and-forget, we don't need to read the response,
+    // and Apps Script doesn't return CORS headers for simple GETs like this.
+    await fetch(`${USAGE_LOG_URL}?${params.toString()}`, { mode: "no-cors" });
+  } catch (err) {
+    // Silently ignore — usage logging should never block or break the app,
+    // e.g. when offline.
+    console.error("Usage log failed (non-critical):", err);
+  }
+}
+
 function mapRows(json) {
   return json.slice(1).map((row, i) => ({
     id: i,
@@ -136,4 +178,5 @@ window.addEventListener("load", async () => {
 
  // await refreshFromServer(false);
   registerServiceWorker();
+  logUsage(); // fire-and-forget, never blocks the UI
 });

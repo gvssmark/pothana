@@ -168,6 +168,7 @@ button {
   background: #f7f4ff;
   border-radius: 12px;
   padding: 12px 14px;
+  background:#dce1e6;
 }
 
 .padyam .line-red {
@@ -179,8 +180,9 @@ button {
 }
 
 .meaning {
-  color: #d81b60;
+  color: black;
   line-height: 1.7;
+  background:beige;
 }
 
 .bhavam {
@@ -203,6 +205,7 @@ button {
   position: sticky;
   top: 0;
   z-index: 1;
+background:#f2a1a1;
 }
 
 .meaning-wrap,

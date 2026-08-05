@@ -117,6 +117,35 @@ button {
   flex: 1;
 }
 
+.padyam-pane {
+  flex: 0 1 auto;
+  max-height: 50%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 14px;
+  border-bottom: 1px solid #eee;
+}
+
+.details-pane {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 14px;
+}
+
+.pasam-sublabel {
+  font-weight: 700;
+  color: #673ab7;
+  margin: 0 0 4px;
+  font-size: calc(14px * var(--font-scale));
+}
+
+.seesa-divider {
+  border: none;
+  border-top: 1px dashed #d8c8ff;
+  margin: 16px 0;
+}
+
 .padyam {
   font-size: calc(18px * var(--font-scale));
   line-height: 1.8;

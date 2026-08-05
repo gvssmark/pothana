@@ -43,6 +43,32 @@ function positionKey(row) {
   return `${row.skandhamu}|||${row.ghattamu}|||${row.pasam}`;
 }
 
+// A "సీ" (seesa) verse never carries its own meaning/bhavam — those live on
+// the very next row, which completes it. Such a row should never be shown
+// on its own; it always merges into a single card with its companion.
+function isSeeStarterRow(row) {
+  return !!row && /సీ\.?\s*$/.test(row.pasam.trim()) && !row.teeka.trim() && !row.tippani.trim();
+}
+
+// Used for direct jumps (Home menu, search results, restoring a bookmark):
+// if the target index is a సీ-starter, redirect forward to its companion.
+function normalizeCardIndex(idx) {
+  if (idx >= 0 && idx < data.length && isSeeStarterRow(data[idx])) {
+    return idx + 1;
+  }
+  return idx;
+}
+
+// Used for Prev/Next: skip a సీ-starter in whichever direction we're paging,
+// so it's never a separate stop either way.
+function stepCardIndex(current, delta) {
+  let target = current + delta;
+  if (target >= 0 && target < data.length && isSeeStarterRow(data[target])) {
+    target += delta;
+  }
+  return target;
+}
+
 function formatPadyam(str = "") {
   const lines = String(str).split(/\r\n|\r|\n/);
   return lines
@@ -61,6 +87,21 @@ function renderCard(row) {
     return;
   }
 
+  const seeCompanion = data[currentIndex - 1];
+  const isMerged = isSeeStarterRow(seeCompanion);
+
+  const padyamHtml = isMerged
+    ? `
+      <p class="pasam-sublabel">${escapeHtml(seeCompanion.pasam)}</p>
+      <p class="padyam">${formatPadyam(seeCompanion.padyam)}</p>
+      <hr class="seesa-divider">
+      <p class="pasam-sublabel">${escapeHtml(row.pasam)}</p>
+      <p class="padyam">${formatPadyam(row.padyam)}</p>
+    `
+    : `<p class="padyam">${formatPadyam(row.padyam)}</p>`;
+
+  const titlePasam = isMerged ? seeCompanion.pasam : row.pasam;
+
   container.innerHTML = `
     <article class="card">
       <div class="card-head">
@@ -70,11 +111,12 @@ function renderCard(row) {
             <button id="backToPlaceBtn" class="back-to-place-btn">↩ Back to my place</button>
           </div>
         ` : ""}
-        <h4>${escapeHtml(row.skandhamu)} – ${escapeHtml(row.ghattamu)} – ${escapeHtml(row.pasam)}</h4>
+        <h4>${escapeHtml(row.skandhamu)} – ${escapeHtml(row.ghattamu)} – ${escapeHtml(titlePasam)}</h4>
       </div>
-      <div id="cardBody" class="card-body">
-        <p class="padyam">${formatPadyam(row.padyam)}</p>
-
+      <div id="padyamPane" class="padyam-pane">
+        ${padyamHtml}
+      </div>
+      <div id="detailsPane" class="details-pane">
         <section class="toggle-block">
           <button class="toggle-btn" id="meaningToggle" aria-expanded="${uiPrefs.meaningExpanded}">
             పద్యార్థము ${uiPrefs.meaningExpanded ? "−" : "+"}
@@ -144,25 +186,26 @@ function bindCardToggles() {
 }
 
 function scrollCardBodyToTop() {
-  const body = document.getElementById("cardBody");
-  if (body) {
-    body.scrollTo({ top: 0, behavior: "auto" });
-  }
+  const padyamPane = document.getElementById("padyamPane");
+  const detailsPane = document.getElementById("detailsPane");
+  if (padyamPane) padyamPane.scrollTo({ top: 0, behavior: "auto" });
+  if (detailsPane) detailsPane.scrollTo({ top: 0, behavior: "auto" });
 }
 
 function showCard(index, options = {}) {
   const persist = options.persist !== false;
+  const targetIndex = normalizeCardIndex(index);
 
-  if (index >= 0 && index < data.length) {
-    currentIndex = index;
+  if (targetIndex >= 0 && targetIndex < data.length) {
+    currentIndex = targetIndex;
     isPreviewMode = !persist;
-    const row = data[index];
+    const row = data[targetIndex];
     renderCard(row);
     updateNavButtons();
 
     if (persist) {
       saveMeta("readingPosition", {
-        index,
+        index: targetIndex,
         key: positionKey(row)
       });
     }
@@ -500,8 +543,8 @@ function showStatus(message) {
 }
 
 function initUIEvents(refreshHandler) {
-  document.getElementById("prevBtn").addEventListener("click", () => showCard(currentIndex - 1, { persist: !isPreviewMode }));
-  document.getElementById("nextBtn").addEventListener("click", () => showCard(currentIndex + 1, { persist: !isPreviewMode }));
+  document.getElementById("prevBtn").addEventListener("click", () => showCard(stepCardIndex(currentIndex, -1), { persist: !isPreviewMode }));
+  document.getElementById("nextBtn").addEventListener("click", () => showCard(stepCardIndex(currentIndex, 1), { persist: !isPreviewMode }));
   document.getElementById("homeBtn").addEventListener("click", openMenu);
   document.getElementById("menuBtn").addEventListener("click", openMenu);
   document.getElementById("closeMenuBtn").addEventListener("click", closeMenu);

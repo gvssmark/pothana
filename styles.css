@@ -119,11 +119,12 @@ button {
 
 .padyam-pane {
   flex: 0 1 auto;
-  max-height: 50%;
+  min-height: 20%;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   padding: 14px;
-  border-bottom: 1px solid #eee;
+  xborder-bottom: 1px solid #eee;
+background:beige;
 }
 
 .details-pane {

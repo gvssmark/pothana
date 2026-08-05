@@ -102,17 +102,18 @@ function renderCard(row) {
 
   const titlePasam = isMerged ? seeCompanion.pasam : row.pasam;
 
+  updateHeaderContext(row, titlePasam);
+
   container.innerHTML = `
     <article class="card">
-      <div class="card-head">
-        ${isPreviewMode ? `
+      ${isPreviewMode ? `
+        <div class="card-head">
           <div class="preview-banner">
             <span>సెర్చ్ ఫలితం చూస్తున్నారు</span>
             <button id="backToPlaceBtn" class="back-to-place-btn">↩ Back to my place</button>
           </div>
-        ` : ""}
-        <h4>${escapeHtml(row.skandhamu)} – ${escapeHtml(row.ghattamu)} – ${escapeHtml(titlePasam)}</h4>
-      </div>
+        </div>
+      ` : ""}
       <div id="padyamPane" class="padyam-pane">
         ${padyamHtml}
       </div>
@@ -141,6 +142,13 @@ function renderCard(row) {
   bindCardToggles();
   bindBackToPlaceButton();
   scrollCardBodyToTop();
+}
+
+function updateHeaderContext(row, titlePasam) {
+  const skandaEl = document.getElementById("headerSkanda");
+  const ghattaPasamEl = document.getElementById("headerGhattaPasam");
+  if (skandaEl) skandaEl.textContent = row.skandhamu;
+  if (ghattaPasamEl) ghattaPasamEl.textContent = `${row.ghattamu} – ${titlePasam}`;
 }
 
 async function bindBackToPlaceButton() {

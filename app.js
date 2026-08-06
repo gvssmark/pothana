@@ -76,10 +76,12 @@ async function loadPrefs() {
     uiPrefs = {
       meaningExpanded: savedPrefs.meaningExpanded !== false,
       bhavamExpanded: savedPrefs.bhavamExpanded !== false,
-      fontScale: typeof savedPrefs.fontScale === "number" ? savedPrefs.fontScale : 1
+      fontScale: typeof savedPrefs.fontScale === "number" ? savedPrefs.fontScale : 1,
+      theme: savedPrefs.theme === "temple" ? "temple" : ""
     };
   }
   applyFontScale();
+  applyTheme();
 }
 
 async function loadFromIndexedDB() {

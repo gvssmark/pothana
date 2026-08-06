@@ -4,7 +4,8 @@ let isPreviewMode = false;
 let uiPrefs = {
   meaningExpanded: true,
   bhavamExpanded: true,
-  fontScale: 1
+  fontScale: 1,
+  theme: ""
 };
 
 const FONT_SCALE_MIN = 0.85;
@@ -27,6 +28,27 @@ async function stepFontSize(delta) {
   const next = Math.min(FONT_SCALE_MAX, Math.max(FONT_SCALE_MIN, uiPrefs.fontScale + delta));
   uiPrefs.fontScale = Math.round(next * 100) / 100;
   applyFontScale();
+  await saveMeta("uiPrefs", uiPrefs);
+}
+
+function applyTheme() {
+  if (uiPrefs.theme) {
+    document.documentElement.setAttribute("data-theme", uiPrefs.theme);
+  } else {
+    document.documentElement.removeAttribute("data-theme");
+  }
+
+  const themeMeta = document.querySelector('meta[name="theme-color"]');
+  if (themeMeta) themeMeta.setAttribute("content", uiPrefs.theme === "temple" ? "#2b1010" : "#5c1a1a");
+
+  document.querySelectorAll(".theme-chip").forEach(chip => {
+    chip.classList.toggle("active", chip.dataset.themeValue === uiPrefs.theme);
+  });
+}
+
+async function setTheme(value) {
+  uiPrefs.theme = value;
+  applyTheme();
   await saveMeta("uiPrefs", uiPrefs);
 }
 
@@ -570,6 +592,9 @@ function initUIEvents(refreshHandler) {
   bindSearchScopeChips();
   document.getElementById("fontDecreaseBtn").addEventListener("click", () => stepFontSize(-FONT_SCALE_STEP));
   document.getElementById("fontIncreaseBtn").addEventListener("click", () => stepFontSize(FONT_SCALE_STEP));
+  document.querySelectorAll(".theme-chip").forEach(chip => {
+    chip.addEventListener("click", () => setTheme(chip.dataset.themeValue));
+  });
   document.getElementById("refreshBtn").addEventListener("click", async () => {
     closeMenu();
     await refreshHandler(true);

@@ -3,6 +3,60 @@ html {
   overflow: hidden;
 }
 
+:root {
+  --font-scale: 1;
+
+  --page-bg: #fdf6e3;
+  --text-primary: #3a1f10;
+
+  --header-bg: #5c1a1a;
+  --header-border-bottom: none;
+  --header-title: #f3d98d;
+  --header-icon: #e8c88a;
+  --header-skanda: #e26a6a;
+  --header-ghatta: #e8c88a;
+
+  --surface-bg: #fffdf7;
+  --padyam-bg: #fbeed2;
+  --ring-color: #c9a227;
+  --ring-soft: #e6d3a3;
+
+  --label-bg: #5c1a1a;
+  --label-color: #f3d98d;
+
+  --accent-strong: #5c1a1a;
+  --accent-on-strong: #f3d98d;
+  --accent-strong-disabled: #a9776f;
+
+  --details-text: #4a2c1a;
+}
+
+[data-theme="temple"] {
+  --page-bg: #f6f1e4;
+  --text-primary: #2b1010;
+
+  --header-bg: #2b1010;
+  --header-border-bottom: 2px solid #c9a227;
+  --header-title: #d4af37;
+  --header-icon: #d4af37;
+  --header-skanda: #ef8080;
+  --header-ghatta: #cbb98a;
+
+  --surface-bg: #fffdf7;
+  --padyam-bg: #fdf8ec;
+  --ring-color: #c9a227;
+  --ring-soft: #e9e0c8;
+
+  --label-bg: #2b1010;
+  --label-color: #d4af37;
+
+  --accent-strong: #2b1010;
+  --accent-on-strong: #d4af37;
+  --accent-strong-disabled: #6b4a42;
+
+  --details-text: #3a281f;
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -14,17 +68,10 @@ body {
   overflow: hidden;
   overscroll-behavior: none;
   font-family: "Mandali", Arial, sans-serif;
-  background: #f4f1fb;
+  background: var(--page-bg);
   display: flex;
   flex-direction: column;
-}
-
-:root {
-  --font-scale: 1;
-}
-
-body {
-  color: #222;
+  color: var(--text-primary);
   font-size: calc(16px * var(--font-scale));
 }
 
@@ -36,8 +83,9 @@ button {
   position: sticky;
   top: 0;
   z-index: 1000;
-  background: #673ab7;
-  color: #fff;
+  background: var(--header-bg);
+  border-bottom: var(--header-border-bottom);
+  color: var(--accent-on-strong);
   padding: 10px 16px 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.12);
 }
@@ -57,18 +105,20 @@ button {
   margin: 0;
   font-size: 13px;
   font-weight: 700;
-  color: #ff5252;
+  color: var(--header-skanda);
 }
 
 .header-ghatta-pasam {
   margin: 2px 0 0;
   font-size: 13px;
-  color: #ede3ff;
+  color: var(--header-ghatta);
 }
 
 .app-header h1 {
   margin: 0;
   font-size: 20px;
+  color: var(--header-title);
+  font-weight: 700;
 }
 
 .header-actions {
@@ -84,8 +134,16 @@ button {
 .icon-btn {
   border: none;
   background: transparent;
-  color: #fff;
+  color: var(--header-icon);
   font-size: 24px;
+}
+
+.icon-btn.dark {
+  color: var(--accent-strong);
+}
+
+#closeSearchBtn {
+  color: var(--accent-on-strong);
 }
 
 .card-container {
@@ -98,7 +156,7 @@ button {
 }
 
 .card {
-  background: #fff;
+  background: var(--surface-bg);
   border-radius: 14px;
   box-shadow: 0 6px 20px rgba(0,0,0,0.08);
   overflow: hidden;
@@ -115,8 +173,8 @@ button {
   position: sticky;
   top: 0;
   z-index: 2;
-  background: #efe7ff;
-  border-bottom: 1px solid #ddd;
+  background: var(--surface-bg);
+  border-bottom: 1px solid var(--ring-soft);
   padding: 12px 14px;
 }
 
@@ -135,8 +193,8 @@ button {
 
 .back-to-place-btn {
   border: none;
-  background: #673ab7;
-  color: #fff;
+  background: var(--accent-strong);
+  color: var(--accent-on-strong);
   border-radius: 999px;
   padding: 6px 12px;
   font-size: 13px;
@@ -157,7 +215,7 @@ button {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   padding: 14px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--ring-soft);
 }
 
 .details-pane {
@@ -169,14 +227,14 @@ button {
 
 .pasam-sublabel {
   font-weight: 700;
-  color: #673ab7;
+  color: var(--accent-strong);
   margin: 0 0 4px;
   font-size: calc(14px * var(--font-scale));
 }
 
 .seesa-divider {
   border: none;
-  border-top: 1px dashed #d8c8ff;
+  border-top: 1px dashed var(--ring-color);
   margin: 16px 0;
 }
 
@@ -184,26 +242,29 @@ button {
   font-size: calc(18px * var(--font-scale));
   line-height: 1.8;
   white-space: normal;
-  background: #f7f4ff;
+  background: var(--padyam-bg);
+  border: 1px solid var(--ring-color);
   border-radius: 12px;
   padding: 12px 14px;
+  box-shadow: inset 0 0 0 3px var(--surface-bg), inset 0 0 0 4px var(--ring-color);
+  color: var(--text-primary);
 }
 
 .padyam .line-red {
-  color: #c62828;
+  color: #7a2020;
 }
 
 .padyam .line-blue {
-  color: #1a4fbf;
+  color: #5c4420;
 }
 
 .meaning {
-  color: #d81b60;
+  color: #9c4221;
   line-height: 1.7;
 }
 
 .bhavam {
-  color: #2e7d32;
+  color: #3f6b2a;
   line-height: 1.7;
 }
 
@@ -215,7 +276,8 @@ button {
   width: 100%;
   text-align: left;
   border: none;
-  background: #f2f2f2;
+  background: var(--label-bg);
+  color: var(--label-color);
   padding: 10px 12px;
   border-radius: 8px;
   font-weight: 700;
@@ -241,7 +303,7 @@ button {
   display: flex;
   gap: 8px;
   padding: 10px 12px;
-  background: #fff;
+  background: var(--header-bg);
   box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
   z-index: 1100;
 }
@@ -251,13 +313,13 @@ button {
   border: none;
   border-radius: 10px;
   padding: 12px;
-  background: #673ab7;
-  color: #fff;
+  background: var(--accent-strong);
+  color: var(--accent-on-strong);
   font-size: 14px;
 }
 
 .footer-nav button:disabled {
-  background: #b7a8d6;
+  background: var(--accent-strong-disabled);
 }
 
 .side-panel {
@@ -267,7 +329,7 @@ button {
   width: min(84vw, 360px);
   height: 100vh;
   height: 100dvh;
-  background: #fff;
+  background: var(--surface-bg);
   z-index: 1300;
   box-shadow: 4px 0 16px rgba(0,0,0,0.18);
   padding: 16px;
@@ -275,6 +337,7 @@ button {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   box-sizing: border-box;
+  color: var(--text-primary);
 }
 
 .side-panel-header {
@@ -284,7 +347,7 @@ button {
 }
 
 .side-panel-header .icon-btn {
-  color: #333;
+  color: var(--accent-strong);
   font-size: 22px;
 }
 
@@ -292,14 +355,21 @@ button {
   margin-top: 18px;
 }
 
+.panel-section h3 {
+  font-size: 14px;
+  color: var(--accent-strong);
+  margin: 0 0 8px;
+}
+
 .panel-btn {
   width: 100%;
   text-align: left;
   border: none;
-  background: #f4ecff;
+  background: var(--padyam-bg);
   margin-bottom: 10px;
   padding: 10px 12px;
   border-radius: 8px;
+  color: var(--text-primary);
 }
 
 .home-tree {
@@ -307,10 +377,10 @@ button {
 }
 
 .home-tree details {
-  border: 1px solid #e4d7ff;
+  border: 1px solid var(--ring-soft);
   border-radius: 8px;
   margin-bottom: 10px;
-  background: #faf7ff;
+  background: var(--padyam-bg);
 }
 
 .home-tree summary {
@@ -327,12 +397,13 @@ button {
 .ghatta-btn {
   width: 100%;
   border: none;
-  background: #fff;
+  background: var(--surface-bg);
   padding: 10px 12px;
   margin-top: 8px;
   border-radius: 8px;
   text-align: left;
-  box-shadow: inset 0 0 0 1px #eadfff;
+  box-shadow: inset 0 0 0 1px var(--ring-soft);
+  color: var(--text-primary);
 }
 
 .overlay {
@@ -358,7 +429,8 @@ button {
   max-height: 88vh;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  background: #fff;
+  background: var(--surface-bg);
+  color: var(--text-primary);
   border-radius: 16px;
   padding: 20px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.25);
@@ -366,12 +438,13 @@ button {
 
 .modal-card h2 {
   margin-top: 0;
+  color: var(--accent-strong);
 }
 
 .primary-btn {
   border: none;
-  background: #673ab7;
-  color: #fff;
+  background: var(--accent-strong);
+  color: var(--accent-on-strong);
   border-radius: 10px;
   padding: 12px 16px;
   margin-top: 10px;
@@ -400,21 +473,22 @@ button {
   display: none !important;
 }
 
-.font-size-control {
+.font-size-control,
+.theme-control {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  background: #faf7ff;
-  border: 1px solid #e4d7ff;
+  background: var(--padyam-bg);
+  border: 1px solid var(--ring-soft);
   border-radius: 10px;
   padding: 10px 14px;
 }
 
 .font-size-btn {
   border: none;
-  background: #673ab7;
-  color: #fff;
+  background: var(--accent-strong);
+  color: var(--accent-on-strong);
   border-radius: 8px;
   padding: 8px 14px;
   font-size: 16px;
@@ -423,16 +497,41 @@ button {
 }
 
 .font-size-btn:disabled {
-  background: #c9b8ea;
+  background: var(--accent-strong-disabled);
   cursor: default;
 }
 
 .font-size-label {
   font-size: 14px;
-  color: #52309e;
+  color: var(--accent-strong);
   font-weight: 600;
   min-width: 44px;
   text-align: center;
+}
+
+.theme-chip-row {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.theme-chip {
+  flex: 1;
+  border: 1px solid var(--ring-soft);
+  background: var(--surface-bg);
+  color: var(--text-primary);
+  border-radius: 8px;
+  padding: 8px 6px;
+  font-size: 12px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.theme-chip.active {
+  background: var(--accent-strong);
+  color: var(--accent-on-strong);
+  border-color: var(--accent-strong);
+  font-weight: 700;
 }
 
 @keyframes flashPulse {
@@ -441,7 +540,7 @@ button {
 }
 
 .flash-announcement {
-  color: #d81b60;
+  color: #c0392b;
   font-weight: 700;
   text-align: center;
   animation: flashPulse 1.2s ease-in-out infinite;
@@ -458,7 +557,8 @@ button {
   position: fixed;
   inset: 0;
   z-index: 1450;
-  background: #fff;
+  background: var(--surface-bg);
+  color: var(--text-primary);
   height: 100vh;
   height: 100dvh;
   display: flex;
@@ -470,8 +570,8 @@ button {
   align-items: center;
   justify-content: space-between;
   padding: 14px 16px;
-  background: #673ab7;
-  color: #fff;
+  background: var(--header-bg);
+  color: var(--accent-on-strong);
   flex: 0 0 auto;
 }
 
@@ -482,7 +582,7 @@ button {
 
 .search-controls {
   padding: 12px 16px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--ring-soft);
   flex: 0 0 auto;
 }
 
@@ -496,16 +596,18 @@ button {
   width: 100%;
   padding: 11px 40px 11px 12px;
   border-radius: 10px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--ring-soft);
   font-size: 16px;
   box-sizing: border-box;
+  background: var(--surface-bg);
+  color: var(--text-primary);
 }
 
 .search-clear-btn {
   position: absolute;
   right: 2px;
   font-size: 16px;
-  color: #888;
+  color: var(--accent-strong);
   padding: 8px;
 }
 
@@ -517,9 +619,9 @@ button {
 }
 
 .scope-chip {
-  border: 1px solid #d8c8ff;
-  background: #faf7ff;
-  color: #52309e;
+  border: 1px solid var(--ring-soft);
+  background: var(--padyam-bg);
+  color: var(--accent-strong);
   border-radius: 999px;
   padding: 6px 14px;
   font-size: 14px;
@@ -529,9 +631,9 @@ button {
 }
 
 .scope-chip.active {
-  background: #673ab7;
-  color: #fff;
-  border-color: #673ab7;
+  background: var(--accent-strong);
+  color: var(--accent-on-strong);
+  border-color: var(--accent-strong);
 }
 
 .search-results {
@@ -553,13 +655,13 @@ button {
 
 .search-result-head {
   font-weight: 700;
-  color: #673ab7;
+  color: var(--accent-strong);
   margin-bottom: 4px;
   font-size: 15px;
 }
 
 .search-result-snippet {
-  color: #444;
+  color: var(--details-text);
   font-size: 14px;
   line-height: 1.5;
 }
@@ -573,12 +675,12 @@ button {
 
 .search-result-divider {
   border: none;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--ring-soft);
   margin: 0;
 }
 
 .search-hint {
-  color: #777;
+  color: var(--details-text);
   padding: 24px 0;
   text-align: center;
   font-size: 14px;

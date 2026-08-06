@@ -1,4 +1,4 @@
-const CACHE_NAME = "pothana-cache-v19.0";
+const CACHE_NAME = "pothana-cache-v20";
 
 self.addEventListener("install", event => {
   event.waitUntil(

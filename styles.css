@@ -1,10 +1,22 @@
-html, body {
+html {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
   margin: 0;
   padding: 0;
-  height: 100dvh;
+  height: 100%;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
   font-family: "Mandali", Arial, sans-serif;
   background: #f4f1fb;
-  overscroll-behavior-y: none;
+  display: flex;
+  flex-direction: column;
 }
 
 :root {
@@ -14,9 +26,6 @@ html, body {
 body {
   color: #222;
   font-size: calc(16px * var(--font-scale));
- overscroll-behavior-y: none;
-height: 100dvh;
-
 }
 
 button {
@@ -80,7 +89,12 @@ button {
 }
 
 .card-container {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
   padding: 16px 16px 84px;
+  box-sizing: border-box;
 }
 
 .card {
@@ -89,8 +103,10 @@ button {
   box-shadow: 0 6px 20px rgba(0,0,0,0.08);
   overflow: hidden;
   max-width: 900px;
+  width: 100%;
   margin: 0 auto;
-  height: calc(100vh - 150px);
+  flex: 1 1 auto;
+  min-height: 0;
   display: flex;
   flex-direction: column;
 }
@@ -171,7 +187,6 @@ button {
   background: #f7f4ff;
   border-radius: 12px;
   padding: 12px 14px;
-  background:#dce1e6;
 }
 
 .padyam .line-red {
@@ -183,9 +198,8 @@ button {
 }
 
 .meaning {
-  color: black;
+  color: #d81b60;
   line-height: 1.7;
-  background:beige;
 }
 
 .bhavam {
@@ -208,7 +222,6 @@ button {
   position: sticky;
   top: 0;
   z-index: 1;
-background:#f2a1a1;
 }
 
 .meaning-wrap,
@@ -342,6 +355,9 @@ background:#f2a1a1;
 
 .modal-card {
   width: min(92vw, 560px);
+  max-height: 88vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   background: #fff;
   border-radius: 16px;
   padding: 20px;
@@ -575,10 +591,6 @@ background:#f2a1a1;
 
   .card-container {
     padding: 10px 10px 84px;
-  }
-
-  .card {
-    height: calc(100vh - 135px);
   }
 
   .padyam {

@@ -1,23 +1,23 @@
 :root {
   --font-scale: 1;
 
-  --page-bg: #fdf6e3;
-  --text-primary: #3a1f10;
-  --header-bg: #0622f4;
-  --header-title: #f8f8f7;
-  --header-icon: #e8c88a;
-  --header-skanda: #f8f2f2;
-  --header-ghatta: #fefdfb;
-  --surface-bg: #f8f5ff;
+  --page-bg: #ffffff;
+  --text-primary: #050505;
+  --header-bg: #1100fa;
+  --header-title: #ffffff;
+  --header-icon: #ffffff;
+  --header-skanda: #ffffff;
+  --header-ghatta: #ffffff;
+  --surface-bg: #fffdf7;
   --padyam-bg: #fbeed2;
   --ring-color: #c9a227;
   --ring-soft: #e6d3a3;
-  --label-bg: #f70202;
+  --label-bg: #5c1a1a;
   --label-color: #f3d98d;
-  --accent-strong: #2a01f4;
-  --accent-on-strong: #f4f3f0;
+  --accent-strong: #1100ff;
+  --accent-on-strong: #ffffff;
   --accent-strong-disabled: #a9776f;
-  --details-text: #000000;
+  --details-text: #4a2c1a;
 }
 
 [data-theme="temple"] {

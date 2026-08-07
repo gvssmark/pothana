@@ -3,51 +3,39 @@
 
   --page-bg: #fdf6e3;
   --text-primary: #3a1f10;
-
-  --header-bg: #5c1a1a;
-  --header-border-bottom: none;
-  --header-title: #f3d98d;
+  --header-bg: #0622f4;
+  --header-title: #f8f8f7;
   --header-icon: #e8c88a;
-  --header-skanda: #e26a6a;
-  --header-ghatta: #e8c88a;
-
-  --surface-bg: #fffdf7;
+  --header-skanda: #f8f2f2;
+  --header-ghatta: #fefdfb;
+  --surface-bg: #f8f5ff;
   --padyam-bg: #fbeed2;
   --ring-color: #c9a227;
   --ring-soft: #e6d3a3;
-
-  --label-bg: #5c1a1a;
+  --label-bg: #f70202;
   --label-color: #f3d98d;
-
-  --accent-strong: #5c1a1a;
-  --accent-on-strong: #f3d98d;
+  --accent-strong: #2a01f4;
+  --accent-on-strong: #f4f3f0;
   --accent-strong-disabled: #a9776f;
-
-  --details-text: #4a2c1a;
+  --details-text: #000000;
 }
 
 [data-theme="temple"] {
   --page-bg: #f6f1e4;
   --text-primary: #2b1010;
-
   --header-bg: #2b1010;
-  --header-border-bottom: 2px solid #c9a227;
   --header-title: #d4af37;
   --header-icon: #d4af37;
   --header-skanda: #ef8080;
   --header-ghatta: #cbb98a;
-
   --surface-bg: #fffdf7;
   --padyam-bg: #fdf8ec;
   --ring-color: #c9a227;
   --ring-soft: #e9e0c8;
-
   --label-bg: #2b1010;
   --label-color: #d4af37;
-
   --accent-strong: #2b1010;
   --accent-on-strong: #d4af37;
   --accent-strong-disabled: #6b4a42;
-
   --details-text: #3a281f;
 }

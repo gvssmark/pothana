@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pothana — Theme Editor (dev tool, not part of the live app)</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #eee;
+    display: flex;
+    height: 100vh;
+  }
+
+  #controls {
+    width: 360px;
+    flex: 0 0 auto;
+    background: #fff;
+    border-right: 1px solid #ddd;
+    overflow-y: auto;
+    padding: 16px;
+  }
+
+  #controls h1 {
+    font-size: 16px;
+    margin: 0 0 4px;
+  }
+
+  #controls .sub {
+    font-size: 12px;
+    color: #777;
+    margin: 0 0 16px;
+  }
+
+  .theme-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+
+  .theme-tabs button {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    background: #f5f5f5;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+
+  .theme-tabs button.active {
+    background: #333;
+    color: #fff;
+    border-color: #333;
+  }
+
+  .var-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .var-row label {
+    font-size: 12px;
+    color: #333;
+    flex: 1;
+  }
+
+  .var-row input[type="color"] {
+    width: 36px;
+    height: 28px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  .var-row input[type="text"] {
+    width: 80px;
+    font-size: 12px;
+    font-family: monospace;
+    padding: 4px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  #actions {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  #actions button {
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  #downloadBtn {
+    background: #2e7d32;
+    color: #fff;
+  }
+
+  #resetBtn {
+    background: #eee;
+    color: #333;
+  }
+
+  #preview-pane {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+
+  #mockup {
+    width: 380px;
+    border-radius: 28px;
+    overflow: hidden;
+    border: 8px solid #1a1a1a;
+    background: #000;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  }
+
+  #mockup .screen {
+    display: flex;
+    flex-direction: column;
+    height: 700px;
+    background: var(--page-bg);
+    color: var(--text-primary);
+    font-family: Arial, sans-serif;
+  }
+
+  .m-header {
+    background: var(--header-bg);
+    border-bottom: var(--header-border-bottom);
+    padding: 14px 16px 10px;
+    flex: 0 0 auto;
+  }
+
+  .m-header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .m-header-top span { color: var(--header-icon); font-size: 18px; }
+
+  .m-header h1 {
+    margin: 0;
+    font-size: 17px;
+    color: var(--header-title);
+  }
+
+  .m-skanda { margin: 6px 0 0; font-size: 12px; font-weight: 700; color: var(--header-skanda); text-align: center; }
+  .m-ghatta { margin: 2px 0 0; font-size: 12px; color: var(--header-ghatta); text-align: center; }
+
+  .m-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 14px;
+    overflow: hidden;
+  }
+
+  .m-card {
+    background: var(--surface-bg);
+    border-radius: 14px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+  }
+
+  .m-padyam-pane {
+    padding: 14px;
+    border-bottom: 1px solid var(--ring-soft);
+  }
+
+  .m-padyam {
+    background: var(--padyam-bg);
+    border: 1px solid var(--ring-color);
+    border-radius: 12px;
+    padding: 12px 14px;
+    box-shadow: inset 0 0 0 3px var(--surface-bg), inset 0 0 0 4px var(--ring-color);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .m-details {
+    padding: 14px;
+    flex: 1;
+  }
+
+  .m-label {
+    background: var(--label-bg);
+    color: var(--label-color);
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .m-meaning-text { color: var(--details-text); font-size: 13px; margin-top: 8px; line-height: 1.5; }
+
+  .m-footer {
+    flex: 0 0 auto;
+    display: flex;
+    gap: 8px;
+    padding: 10px 12px;
+    background: var(--header-bg);
+  }
+
+  .m-footer button {
+    flex: 1;
+    border: none;
+    border-radius: 10px;
+    padding: 10px;
+    background: var(--accent-strong);
+    color: var(--accent-on-strong);
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+
+<div id="controls">
+  <h1>Pothana Theme Editor</h1>
+  <p class="sub">Dev tool only — not linked from the live app. Edit colors, preview live, download theme.css.</p>
+
+  <div class="theme-tabs">
+    <button id="tabManuscript" class="active">Manuscript &amp; Gold</button>
+    <button id="tabTemple">Deep Temple</button>
+  </div>
+
+  <div id="varList"></div>
+
+  <div id="actions">
+    <button id="downloadBtn">Download theme.css</button>
+    <button id="resetBtn">Reset this theme to default</button>
+  </div>
+</div>
+
+<div id="preview-pane">
+  <div id="mockup">
+    <div class="screen">
+      <div class="m-header">
+        <div class="m-header-top">
+          <span>&#9776;</span>
+          <h1>పోతన తెలుగు భాగవతము</h1>
+          <span>&#128269;</span>
+        </div>
+        <p class="m-skanda">ప్రథమ స్కంధము</p>
+        <p class="m-ghatta">ఉపోద్ఘాతము &#8211; 1-1-శా.</p>
+      </div>
+      <div class="m-body">
+        <div class="m-card">
+          <div class="m-padyam-pane">
+            <div class="m-padyam">
+              శ్రీ కైవల్య పదంబుఁ జేరుటకునై చింతించెదన్ లోక ర<br>
+              క్షైకారంభకు, భక్త పాలన కళా సంరంభకున్...
+            </div>
+          </div>
+          <div class="m-details">
+            <div class="m-label">పద్యార్థము &#8722;</div>
+            <p class="m-meaning-text">శ్రీ = శుభకర మైన; కైవల్య = ముక్తి; పదంబున్ = స్థితిని...</p>
+          </div>
+        </div>
+      </div>
+      <div class="m-footer">
+        <button>&#9664; Previous</button>
+        <button>&#9776; Home</button>
+        <button>Next &#9654;</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const VAR_DEFS = [
+  { key: "--page-bg",               label: "Page background" },
+  { key: "--text-primary",          label: "Body text" },
+  { key: "--header-bg",             label: "Header / footer background" },
+  { key: "--header-title",          label: "Title text" },
+  { key: "--header-icon",           label: "Header icons" },
+  { key: "--header-skanda",         label: "Skanda name" },
+  { key: "--header-ghatta",         label: "Ghatta / pasam line" },
+  { key: "--surface-bg",            label: "Card / panel surface" },
+  { key: "--padyam-bg",             label: "Padyam block background" },
+  { key: "--ring-color",            label: "Padyam gold ring" },
+  { key: "--ring-soft",             label: "Soft hairline borders" },
+  { key: "--label-bg",              label: "Meaning/Bhavam label bg" },
+  { key: "--label-color",           label: "Meaning/Bhavam label text" },
+  { key: "--accent-strong",         label: "Solid buttons" },
+  { key: "--accent-on-strong",      label: "Text on solid buttons" },
+  { key: "--accent-strong-disabled",label: "Disabled button" },
+  { key: "--details-text",          label: "Meaning/Bhavam body text" }
+];
+
+const DEFAULTS = {
+  manuscript: {
+    "--page-bg": "#fdf6e3", "--text-primary": "#3a1f10",
+    "--header-bg": "#5c1a1a", "--header-title": "#f3d98d", "--header-icon": "#e8c88a",
+    "--header-skanda": "#e26a6a", "--header-ghatta": "#e8c88a",
+    "--surface-bg": "#fffdf7", "--padyam-bg": "#fbeed2", "--ring-color": "#c9a227", "--ring-soft": "#e6d3a3",
+    "--label-bg": "#5c1a1a", "--label-color": "#f3d98d",
+    "--accent-strong": "#5c1a1a", "--accent-on-strong": "#f3d98d", "--accent-strong-disabled": "#a9776f",
+    "--details-text": "#4a2c1a"
+  },
+  temple: {
+    "--page-bg": "#f6f1e4", "--text-primary": "#2b1010",
+    "--header-bg": "#2b1010", "--header-title": "#d4af37", "--header-icon": "#d4af37",
+    "--header-skanda": "#ef8080", "--header-ghatta": "#cbb98a",
+    "--surface-bg": "#fffdf7", "--padyam-bg": "#fdf8ec", "--ring-color": "#c9a227", "--ring-soft": "#e9e0c8",
+    "--label-bg": "#2b1010", "--label-color": "#d4af37",
+    "--accent-strong": "#2b1010", "--accent-on-strong": "#d4af37", "--accent-strong-disabled": "#6b4a42",
+    "--details-text": "#3a281f"
+  }
+};
+
+let current = { manuscript: { ...DEFAULTS.manuscript }, temple: { ...DEFAULTS.temple } };
+let activeTheme = "manuscript";
+const mockupScreen = document.querySelector("#mockup .screen");
+
+function applyPreview() {
+  const values = current[activeTheme];
+  for (const key in values) {
+    mockupScreen.style.setProperty(key, values[key]);
+  }
+}
+
+function renderControls() {
+  const container = document.getElementById("varList");
+  container.innerHTML = "";
+  VAR_DEFS.forEach(def => {
+    const value = current[activeTheme][def.key];
+    const row = document.createElement("div");
+    row.className = "var-row";
+    row.innerHTML = `
+      <label>${def.label}<br><span style="color:#999;font-family:monospace;">${def.key}</span></label>
+      <input type="color" value="${value}" data-key="${def.key}">
+      <input type="text" value="${value}" data-key="${def.key}">
+    `;
+    container.appendChild(row);
+  });
+
+  container.querySelectorAll('input[type="color"]').forEach(input => {
+    input.addEventListener("input", e => {
+      const key = e.target.dataset.key;
+      current[activeTheme][key] = e.target.value;
+      container.querySelector(`input[type="text"][data-key="${key}"]`).value = e.target.value;
+      applyPreview();
+    });
+  });
+
+  container.querySelectorAll('input[type="text"]').forEach(input => {
+    input.addEventListener("change", e => {
+      const key = e.target.dataset.key;
+      const val = e.target.value.trim();
+      if (/^#[0-9a-fA-F]{6}$/.test(val)) {
+        current[activeTheme][key] = val;
+        container.querySelector(`input[type="color"][data-key="${key}"]`).value = val;
+        applyPreview();
+      }
+    });
+  });
+}
+
+function switchTab(theme) {
+  activeTheme = theme;
+  document.getElementById("tabManuscript").classList.toggle("active", theme === "manuscript");
+  document.getElementById("tabTemple").classList.toggle("active", theme === "temple");
+  renderControls();
+  applyPreview();
+}
+
+document.getElementById("tabManuscript").addEventListener("click", () => switchTab("manuscript"));
+document.getElementById("tabTemple").addEventListener("click", () => switchTab("temple"));
+
+document.getElementById("resetBtn").addEventListener("click", () => {
+  current[activeTheme] = { ...DEFAULTS[activeTheme] };
+  renderControls();
+  applyPreview();
+});
+
+document.getElementById("downloadBtn").addEventListener("click", () => {
+  const lines = [];
+  lines.push(":root {");
+  lines.push("  --font-scale: 1;");
+  lines.push("");
+  VAR_DEFS.forEach(def => lines.push(`  ${def.key}: ${current.manuscript[def.key]};`));
+  lines.push("}");
+  lines.push("");
+  lines.push('[data-theme="temple"] {');
+  VAR_DEFS.forEach(def => lines.push(`  ${def.key}: ${current.temple[def.key]};`));
+  lines.push("}");
+  lines.push("");
+
+  const blob = new Blob([lines.join("\n")], { type: "text/css" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "theme.css";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+
+renderControls();
+applyPreview();
+</script>
+
+</body>
+</html>

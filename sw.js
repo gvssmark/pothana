@@ -1,4 +1,4 @@
-const CACHE_NAME = "pothana-cache-v20";
+const CACHE_NAME = "pothana-cache-v21";
 
 self.addEventListener("install", event => {
   event.waitUntil(
@@ -7,12 +7,14 @@ self.addEventListener("install", event => {
       await cache.addAll([
         "./",
         "./index.html",
+        "./theme.css",
         "./styles.css",
         "./app.js",
         "./ui.js",
         "./db.js",
         "./data.js",
-        "./manifest.json"
+        "./manifest.json",
+        "./theme-editor.html"
       ]);
       // Take over as soon as install finishes, instead of waiting
       // for every open tab/app window to be closed first.
@@ -40,9 +42,3 @@ self.addEventListener("fetch", event => {
     caches.match(event.request).then(response => response || fetch(event.request))
   );
 });
-
-
-
-
-
-

@@ -64,6 +64,67 @@
     border-bottom: 1px solid #f0f0f0;
   }
 
+  .var-row.manifest-linked {
+    background: #fff8e1;
+    border: 1px solid #f0d878;
+    border-radius: 6px;
+    padding: 6px 8px;
+    margin: 4px 0;
+  }
+
+  .var-row.manifest-linked label {
+    color: #7a5900;
+  }
+
+  .manifest-flag {
+    display: inline-block;
+    font-size: 10px;
+    color: #a06a00;
+    margin-top: 2px;
+  }
+
+  #manifestReminder {
+    margin-top: 18px;
+    background: #fff3cd;
+    border: 1px solid #f0d878;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 12px;
+    color: #7a5900;
+  }
+
+  #manifestReminder.hidden {
+    display: none;
+  }
+
+  #manifestReminder h3 {
+    margin: 0 0 6px;
+    font-size: 13px;
+  }
+
+  #manifestSnippet {
+    width: 100%;
+    font-family: monospace;
+    font-size: 11px;
+    border: 1px solid #e0c060;
+    border-radius: 6px;
+    padding: 8px;
+    background: #fffdf5;
+    resize: none;
+    margin-top: 6px;
+  }
+
+  #copySnippetBtn {
+    margin-top: 6px;
+    padding: 6px 10px;
+    border: none;
+    border-radius: 6px;
+    background: #7a5900;
+    color: #fff;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
   .var-row label {
     font-size: 12px;
     color: #333;
@@ -245,6 +306,18 @@
 
   <div id="varList"></div>
 
+  <div id="manifestReminder" class="hidden">
+    <h3>⚠️ Also update manifest.json</h3>
+    <p style="margin:0;">
+      "Page background" and "Header background" also control the Android
+      status bar and app-launch splash screen — those come from
+      <code>manifest.json</code>, not <code>theme.css</code>. Paste this in
+      after downloading:
+    </p>
+    <textarea id="manifestSnippet" rows="3" readonly></textarea>
+    <button id="copySnippetBtn">Copy snippet</button>
+  </div>
+
   <div id="actions">
     <button id="downloadBtn">Download theme.css</button>
     <button id="resetBtn">Reset this theme to default</button>
@@ -331,6 +404,7 @@ const DEFAULTS = {
 let current = { manuscript: { ...DEFAULTS.manuscript }, temple: { ...DEFAULTS.temple } };
 let activeTheme = "manuscript";
 const mockupScreen = document.querySelector("#mockup .screen");
+const MANIFEST_LINKED_KEYS = ["--page-bg", "--header-bg"];
 
 function applyPreview() {
   const values = current[activeTheme];
@@ -339,15 +413,31 @@ function applyPreview() {
   }
 }
 
+function updateManifestReminder() {
+  const reminder = document.getElementById("manifestReminder");
+
+  if (activeTheme !== "manuscript") {
+    reminder.classList.add("hidden");
+    return;
+  }
+
+  reminder.classList.remove("hidden");
+  const pageBg = current.manuscript["--page-bg"];
+  const headerBg = current.manuscript["--header-bg"];
+  document.getElementById("manifestSnippet").value =
+    `"background_color": "${pageBg}",\n"theme_color": "${headerBg}"`;
+}
+
 function renderControls() {
   const container = document.getElementById("varList");
   container.innerHTML = "";
   VAR_DEFS.forEach(def => {
     const value = current[activeTheme][def.key];
+    const isManifestLinked = activeTheme === "manuscript" && MANIFEST_LINKED_KEYS.includes(def.key);
     const row = document.createElement("div");
-    row.className = "var-row";
+    row.className = "var-row" + (isManifestLinked ? " manifest-linked" : "");
     row.innerHTML = `
-      <label>${def.label}<br><span style="color:#999;font-family:monospace;">${def.key}</span></label>
+      <label>${def.label}<br><span style="color:#999;font-family:monospace;">${def.key}</span>${isManifestLinked ? '<br><span class="manifest-flag">⚠️ also update manifest.json</span>' : ""}</label>
       <input type="color" value="${value}" data-key="${def.key}">
       <input type="text" value="${value}" data-key="${def.key}">
     `;
@@ -360,6 +450,7 @@ function renderControls() {
       current[activeTheme][key] = e.target.value;
       container.querySelector(`input[type="text"][data-key="${key}"]`).value = e.target.value;
       applyPreview();
+      updateManifestReminder();
     });
   });
 
@@ -371,9 +462,12 @@ function renderControls() {
         current[activeTheme][key] = val;
         container.querySelector(`input[type="color"][data-key="${key}"]`).value = val;
         applyPreview();
+        updateManifestReminder();
       }
     });
   });
+
+  updateManifestReminder();
 }
 
 function switchTab(theme) {
@@ -383,6 +477,21 @@ function switchTab(theme) {
   renderControls();
   applyPreview();
 }
+
+document.getElementById("copySnippetBtn").addEventListener("click", () => {
+  const snippet = document.getElementById("manifestSnippet");
+  snippet.select();
+  snippet.setSelectionRange(0, snippet.value.length);
+  const btn = document.getElementById("copySnippetBtn");
+  navigator.clipboard.writeText(snippet.value).then(() => {
+    const original = btn.textContent;
+    btn.textContent = "Copied!";
+    setTimeout(() => { btn.textContent = original; }, 1500);
+  }).catch(() => {
+    // Clipboard API blocked (e.g. file:// origin) — text is already
+    // selected above, so Ctrl+C / Cmd+C still works as a fallback.
+  });
+});
 
 document.getElementById("tabManuscript").addEventListener("click", () => switchTab("manuscript"));
 document.getElementById("tabTemple").addEventListener("click", () => switchTab("temple"));

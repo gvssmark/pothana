@@ -32,7 +32,7 @@ button {
   background: var(--header-bg);
   border-bottom: var(--header-border-bottom);
   color: var(--accent-on-strong);
-  padding: 10px 16px 8px;
+  padding: 8px 16px 6px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.12);
 }
 
@@ -44,19 +44,28 @@ button {
 
 .header-context {
   text-align: center;
-  margin-top: 4px;
+  margin-top: 2px;
+}
+
+.header-context-line {
+  margin: 0;
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .header-skanda {
-  margin: 0;
-  font-size: 13px;
   font-weight: 700;
   color: var(--header-skanda);
 }
 
+.header-context-sep {
+  color: var(--header-ghatta);
+  opacity: 0.6;
+}
+
 .header-ghatta-pasam {
-  margin: 2px 0 0;
-  font-size: 13px;
   color: var(--header-ghatta);
 }
 
@@ -97,7 +106,7 @@ button {
   min-height: 0;
   display: flex;
   flex-direction: column;
-  padding: 16px 16px 84px;
+  padding: 16px 16px 68px;
   box-sizing: border-box;
 }
 
@@ -160,7 +169,7 @@ button {
   min-height: 22%;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 14px;
+  padding: 10px;
   border-bottom: 1px solid var(--ring-soft);
 }
 
@@ -191,7 +200,7 @@ button {
   background: var(--padyam-bg);
   border: 1px solid var(--ring-color);
   border-radius: 12px;
-  padding: 12px 14px;
+  padding: 10px 12px;
   box-shadow: inset 0 0 0 3px var(--surface-bg), inset 0 0 0 4px var(--ring-color);
   color: var(--text-primary);
 }
@@ -248,7 +257,7 @@ button {
   right: 0;
   display: flex;
   gap: 8px;
-  padding: 10px 12px;
+  padding: 6px 12px;
   background: var(--header-bg);
   box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
   z-index: 1100;
@@ -258,7 +267,7 @@ button {
   flex: 1;
   border: none;
   border-radius: 10px;
-  padding: 12px;
+  padding: 9px 12px;
   background: var(--accent-strong);
   color: var(--accent-on-strong);
   font-size: 14px;
@@ -638,7 +647,7 @@ button {
   }
 
   .card-container {
-    padding: 10px 10px 84px;
+    padding: 10px 10px 68px;
   }
 
   .padyam {

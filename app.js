@@ -1,7 +1,7 @@
 const SHEET_URL = "https://script.google.com/macros/s/AKfycbwo-TtPn3DAjHSPCXDwPFerT36QyfPPvUTi7uQEvcmjJso_aWpaKefUsgx_vpJOowHUgg/exec?sheetid=1azp8o_KQvmWNLPeiRK75JBY2Hu8DMY7wJYoWX_1WdWs&sheetname=Sheet1";
 
 // TODO: replace with your deployed usage-log Web App URL (ends in /exec)
-const USAGE_LOG_URL = "https://script.google.com/macros/s/AKfycbwCInJnUidXP2-tlaF-9X8iEoCmyooNjhCFSLrauCh_pPJPtscLion32TDZ01ATi2BI/exec";
+const USAGE_LOG_URL = "PASTE_YOUR_USAGE_LOG_EXEC_URL_HERE";
 
 async function getOrCreateDeviceId() {
   let deviceId = await getMeta("deviceId");
@@ -177,6 +177,8 @@ window.addEventListener("load", async () => {
   }
 
   await restoreSearchState();
+  await loadStarredItems();
+  updateStarButton();
 
  // await refreshFromServer(false);
   registerServiceWorker();

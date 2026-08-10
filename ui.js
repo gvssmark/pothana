@@ -1,6 +1,10 @@
 let currentIndex = 0;
 let data = [];
 let isPreviewMode = false;
+let starredItems = [];
+let readAllMode = false;
+let readAllList = [];
+let readAllPos = 0;
 let uiPrefs = {
   meaningExpanded: true,
   bhavamExpanded: true,
@@ -131,12 +135,13 @@ function renderCard(row) {
       ${isPreviewMode ? `
         <div class="card-head">
           <div class="preview-banner">
-            <span>సెర్చ్ ఫలితం చూస్తున్నారు</span>
+            <span>${readAllMode ? `ఆణిముత్యాలు (${readAllPos + 1}/${readAllList.length})` : "సెర్చ్ ఫలితం చూస్తున్నారు"}</span>
             <button id="backToPlaceBtn" class="back-to-place-btn">↩ Back to my place</button>
           </div>
         </div>
       ` : ""}
       <div id="padyamPane" class="padyam-pane">
+        <button id="starBtn" class="star-btn" aria-label="Star this padyam">☆</button>
         ${padyamHtml}
       </div>
       <div id="detailsPane" class="details-pane">
@@ -163,6 +168,8 @@ function renderCard(row) {
 
   bindCardToggles();
   bindBackToPlaceButton();
+  bindDetailsSwipe();
+  bindStarButton();
   scrollCardBodyToTop();
 }
 
@@ -186,6 +193,216 @@ async function bindBackToPlaceButton() {
       console.error("Back to my place failed:", err);
     }
   });
+}
+
+function scrollToDetailSection(targetId) {
+  const el = document.getElementById(targetId);
+  if (!el) return;
+
+  if (el.classList.contains("collapsed")) {
+    const toggleId = targetId === "meaningWrap" ? "meaningToggle" : "bhavamToggle";
+    const toggle = document.getElementById(toggleId);
+    if (toggle) toggle.click();
+  }
+
+  el.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+let detailsSwipeStartX = 0;
+let detailsSwipeStartY = 0;
+
+function bindDetailsSwipe() {
+  const pane = document.getElementById("detailsPane");
+  if (!pane) return;
+
+  pane.addEventListener("touchstart", e => {
+    if (!e.touches || !e.touches.length) return;
+    detailsSwipeStartX = e.touches[0].clientX;
+    detailsSwipeStartY = e.touches[0].clientY;
+  }, { passive: true });
+
+  pane.addEventListener("touchend", e => {
+    if (!e.changedTouches || !e.changedTouches.length) return;
+    const dx = e.changedTouches[0].clientX - detailsSwipeStartX;
+    const dy = e.changedTouches[0].clientY - detailsSwipeStartY;
+    const SWIPE_MIN_DISTANCE = 50;
+
+    if (Math.abs(dx) < SWIPE_MIN_DISTANCE || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+
+    if (dx < 0) {
+      scrollToDetailSection("bhavamWrap");
+    } else {
+      scrollToDetailSection("meaningWrap");
+    }
+  }, { passive: true });
+}
+
+async function loadStarredItems() {
+  try {
+    const saved = await getMeta("starredItems");
+    starredItems = Array.isArray(saved) ? saved : [];
+  } catch (err) {
+    console.error("Load starred items failed:", err);
+    starredItems = [];
+  }
+}
+
+function isCurrentCardStarred() {
+  const row = data[currentIndex];
+  if (!row) return false;
+  const key = positionKey(row);
+  return starredItems.some(item => item.key === key);
+}
+
+function updateStarButton() {
+  const btn = document.getElementById("starBtn");
+  if (!btn) return;
+  const starred = isCurrentCardStarred();
+  btn.textContent = starred ? "★" : "☆";
+  btn.classList.toggle("starred", starred);
+}
+
+async function toggleStar() {
+  const row = data[currentIndex];
+  if (!row) return;
+
+  const key = positionKey(row);
+  const existingPos = starredItems.findIndex(item => item.key === key);
+
+  if (existingPos !== -1) {
+    starredItems.splice(existingPos, 1);
+  } else {
+    const seeCompanion = data[currentIndex - 1];
+    const isMerged = isSeeStarterRow(seeCompanion);
+    const snippetSource = isMerged ? seeCompanion.padyam : row.padyam;
+    const pasamLabel = isMerged ? `${seeCompanion.pasam}, ${row.pasam}` : row.pasam;
+
+    starredItems.push({
+      index: currentIndex,
+      key,
+      skandhamu: row.skandhamu,
+      ghattamu: row.ghattamu,
+      pasam: pasamLabel,
+      snippet: stripNewlines(snippetSource).slice(0, 80)
+    });
+  }
+
+  await saveMeta("starredItems", starredItems);
+  updateStarButton();
+  if (!document.getElementById("gemsScreen").classList.contains("hidden")) {
+    renderGemsList();
+  }
+}
+
+function bindStarButton() {
+  const btn = document.getElementById("starBtn");
+  if (!btn) return;
+  updateStarButton();
+  btn.addEventListener("click", toggleStar);
+}
+
+function sortedStarredItems() {
+  return [...starredItems].sort((a, b) => a.index - b.index);
+}
+
+function renderGemsList() {
+  const container = document.getElementById("gemsResults");
+  if (!container) return;
+
+  if (!starredItems.length) {
+    container.innerHTML = `<p class="search-hint">ఇంకా ఆణిముత్యాలు గుర్తించలేదు. పద్యం పేజీలో ☆ నొక్కి గుర్తించండి.</p>`;
+    return;
+  }
+
+  const items = sortedStarredItems().map(item => `
+    <button class="search-result-item" data-index="${item.index}">
+      <div class="search-result-head">${escapeHtml(item.skandhamu)} – ${escapeHtml(item.ghattamu)} – ${escapeHtml(item.pasam)}</div>
+      <div class="search-result-snippet">${escapeHtml(item.snippet)}</div>
+    </button>
+    <hr class="search-result-divider">
+  `).join("");
+
+  container.innerHTML = items;
+
+  container.querySelectorAll(".search-result-item").forEach(btn => {
+    btn.addEventListener("click", () => {
+      exitReadAllMode();
+      const index = parseInt(btn.dataset.index, 10);
+      showCard(index, { persist: false });
+      closeGems();
+    });
+  });
+}
+
+function openGems() {
+  document.getElementById("gemsScreen").classList.remove("hidden");
+  document.getElementById("gemsScreen").setAttribute("aria-hidden", "false");
+  renderGemsList();
+}
+
+function closeGems() {
+  document.getElementById("gemsScreen").classList.add("hidden");
+  document.getElementById("gemsScreen").setAttribute("aria-hidden", "true");
+}
+
+function exitReadAllMode() {
+  readAllMode = false;
+  readAllList = [];
+  readAllPos = 0;
+}
+
+function startReadAllGems() {
+  if (!starredItems.length) return;
+  readAllList = sortedStarredItems();
+  readAllPos = 0;
+  readAllMode = true;
+  showCard(readAllList[0].index, { persist: false });
+  closeGems();
+}
+
+function stepReadAll(delta) {
+  if (!readAllList.length) return;
+  readAllPos = (readAllPos + delta + readAllList.length) % readAllList.length;
+  showCard(readAllList[readAllPos].index, { persist: false });
+}
+
+function buildShareText(row) {
+  const seeCompanion = data[currentIndex - 1];
+  const isMerged = isSeeStarterRow(seeCompanion);
+
+  const padyamText = isMerged
+    ? `${seeCompanion.pasam}\n${seeCompanion.padyam}\n\n${row.pasam}\n${row.padyam}`
+    : `${row.pasam}\n${row.padyam}`;
+
+  return [
+    `${row.skandhamu} – ${row.ghattamu}`,
+    "",
+    padyamText,
+    "",
+    "పద్యార్థము:",
+    row.teeka,
+    "",
+    "భావము:",
+    row.tippani
+  ].join("\n");
+}
+
+function shareCurrentCardToWhatsApp() {
+  const row = data[currentIndex];
+  if (!row) return;
+
+  const numberInput = prompt("WhatsApp నంబర్ (దేశ కోడ్‌తో, ఉదా: 91XXXXXXXXXX):", "");
+  if (!numberInput) return;
+
+  const cleanNumber = numberInput.replace(/[^0-9]/g, "");
+  if (!cleanNumber) {
+    alert("సరైన నంబర్ ఇవ్వండి.");
+    return;
+  }
+
+  const message = buildShareText(row);
+  const url = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`;
+  window.open(url, "_blank");
 }
 
 function bindCardToggles() {
@@ -229,6 +446,11 @@ function showCard(index, options = {}) {
   if (targetIndex >= 0 && targetIndex < data.length) {
     currentIndex = targetIndex;
     isPreviewMode = !persist;
+
+    if (persist) {
+      exitReadAllMode();
+    }
+
     const row = data[targetIndex];
     renderCard(row);
     updateNavButtons();
@@ -243,6 +465,11 @@ function showCard(index, options = {}) {
 }
 
 function updateNavButtons() {
+  if (readAllMode) {
+    document.getElementById("prevBtn").disabled = readAllList.length === 0;
+    document.getElementById("nextBtn").disabled = readAllList.length === 0;
+    return;
+  }
   document.getElementById("prevBtn").disabled = currentIndex <= 0;
   document.getElementById("nextBtn").disabled = currentIndex >= data.length - 1;
 }
@@ -468,6 +695,7 @@ function renderSearchResults() {
 
   container.querySelectorAll(".search-result-item").forEach(btn => {
     btn.addEventListener("click", () => {
+      exitReadAllMode();
       const index = parseInt(btn.dataset.index, 10);
       showCard(index, { persist: false });
       closeSearch();
@@ -573,8 +801,14 @@ function showStatus(message) {
 }
 
 function initUIEvents(refreshHandler) {
-  document.getElementById("prevBtn").addEventListener("click", () => showCard(stepCardIndex(currentIndex, -1), { persist: !isPreviewMode }));
-  document.getElementById("nextBtn").addEventListener("click", () => showCard(stepCardIndex(currentIndex, 1), { persist: !isPreviewMode }));
+  document.getElementById("prevBtn").addEventListener("click", () => {
+    if (readAllMode) { stepReadAll(-1); return; }
+    showCard(stepCardIndex(currentIndex, -1), { persist: !isPreviewMode });
+  });
+  document.getElementById("nextBtn").addEventListener("click", () => {
+    if (readAllMode) { stepReadAll(1); return; }
+    showCard(stepCardIndex(currentIndex, 1), { persist: !isPreviewMode });
+  });
   document.getElementById("homeBtn").addEventListener("click", openMenu);
   document.getElementById("menuBtn").addEventListener("click", openMenu);
   document.getElementById("closeMenuBtn").addEventListener("click", closeMenu);
@@ -598,5 +832,15 @@ function initUIEvents(refreshHandler) {
   document.getElementById("refreshBtn").addEventListener("click", async () => {
     closeMenu();
     await refreshHandler(true);
+  });
+  document.getElementById("gemsBtn").addEventListener("click", () => {
+    closeMenu();
+    openGems();
+  });
+  document.getElementById("closeGemsBtn").addEventListener("click", closeGems);
+  document.getElementById("readAllGemsBtn").addEventListener("click", startReadAllGems);
+  document.getElementById("whatsappBtn").addEventListener("click", () => {
+    closeMenu();
+    shareCurrentCardToWhatsApp();
   });
 }

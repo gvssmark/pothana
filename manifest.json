@@ -3,6 +3,7 @@
   "short_name": "భాగవతము",
   "start_url": "index.html",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "background_color": "#fdf6e3",
   "theme_color": "#5c1a1a",
   "icons": [

@@ -6,8 +6,7 @@ let readAllMode = false;
 let readAllList = [];
 let readAllPos = 0;
 let uiPrefs = {
-  meaningExpanded: true,
-  bhavamExpanded: true,
+  activeDetailTab: "meaning",
   fontScale: 1,
   theme: ""
 };
@@ -144,29 +143,18 @@ function renderCard(row) {
         <button id="starBtn" class="star-btn" aria-label="Star this padyam">☆</button>
         ${padyamHtml}
       </div>
+      <div id="detailTabs" class="detail-tabs">
+        <button class="detail-tab ${uiPrefs.activeDetailTab === "meaning" ? "active" : ""}" id="meaningTab" data-tab="meaning">పద్యార్థము</button>
+        <button class="detail-tab ${uiPrefs.activeDetailTab === "bhavam" ? "active" : ""}" id="bhavamTab" data-tab="bhavam">భావము</button>
+      </div>
       <div id="detailsPane" class="details-pane">
-        <section class="toggle-block">
-          <button class="toggle-btn" id="meaningToggle" aria-expanded="${uiPrefs.meaningExpanded}">
-            పద్యార్థము ${uiPrefs.meaningExpanded ? "−" : "+"}
-          </button>
-          <div class="meaning-wrap ${uiPrefs.meaningExpanded ? "" : "collapsed"}" id="meaningWrap">
-            <p class="meaning">${escapeHtml(row.teeka)}</p>
-          </div>
-        </section>
-
-        <section class="toggle-block">
-          <button class="toggle-btn" id="bhavamToggle" aria-expanded="${uiPrefs.bhavamExpanded}">
-            భావము ${uiPrefs.bhavamExpanded ? "−" : "+"}
-          </button>
-          <div class="bhavam-wrap ${uiPrefs.bhavamExpanded ? "" : "collapsed"}" id="bhavamWrap">
-            <p class="bhavam">${escapeHtml(row.tippani)}</p>
-          </div>
-        </section>
+        <p class="meaning ${uiPrefs.activeDetailTab === "meaning" ? "" : "hidden"}" id="meaningContent">${escapeHtml(row.teeka)}</p>
+        <p class="bhavam ${uiPrefs.activeDetailTab === "bhavam" ? "" : "hidden"}" id="bhavamContent">${escapeHtml(row.tippani)}</p>
       </div>
     </article>
   `;
 
-  bindCardToggles();
+  bindDetailTabs();
   bindBackToPlaceButton();
   bindDetailsSwipe();
   bindStarButton();
@@ -195,17 +183,30 @@ async function bindBackToPlaceButton() {
   });
 }
 
-function scrollToDetailSection(targetId) {
-  const el = document.getElementById(targetId);
-  if (!el) return;
+function setActiveDetailTab(tab) {
+  uiPrefs.activeDetailTab = tab;
 
-  if (el.classList.contains("collapsed")) {
-    const toggleId = targetId === "meaningWrap" ? "meaningToggle" : "bhavamToggle";
-    const toggle = document.getElementById(toggleId);
-    if (toggle) toggle.click();
-  }
+  const meaningContent = document.getElementById("meaningContent");
+  const bhavamContent = document.getElementById("bhavamContent");
+  const meaningTab = document.getElementById("meaningTab");
+  const bhavamTab = document.getElementById("bhavamTab");
 
-  el.scrollIntoView({ behavior: "smooth", block: "start" });
+  if (meaningContent) meaningContent.classList.toggle("hidden", tab !== "meaning");
+  if (bhavamContent) bhavamContent.classList.toggle("hidden", tab !== "bhavam");
+  if (meaningTab) meaningTab.classList.toggle("active", tab === "meaning");
+  if (bhavamTab) bhavamTab.classList.toggle("active", tab === "bhavam");
+
+  const pane = document.getElementById("detailsPane");
+  if (pane) pane.scrollTo({ top: 0, behavior: "auto" });
+
+  saveMeta("uiPrefs", uiPrefs).catch(err => console.error("Save active tab failed:", err));
+}
+
+function bindDetailTabs() {
+  const meaningTab = document.getElementById("meaningTab");
+  const bhavamTab = document.getElementById("bhavamTab");
+  if (meaningTab) meaningTab.addEventListener("click", () => setActiveDetailTab("meaning"));
+  if (bhavamTab) bhavamTab.addEventListener("click", () => setActiveDetailTab("bhavam"));
 }
 
 let detailsSwipeStartX = 0;
@@ -229,11 +230,7 @@ function bindDetailsSwipe() {
 
     if (Math.abs(dx) < SWIPE_MIN_DISTANCE || Math.abs(dx) < Math.abs(dy) * 1.5) return;
 
-    if (dx < 0) {
-      scrollToDetailSection("bhavamWrap");
-    } else {
-      scrollToDetailSection("meaningWrap");
-    }
+    setActiveDetailTab(dx < 0 ? "bhavam" : "meaning");
   }, { passive: true });
 }
 
@@ -315,16 +312,19 @@ function renderGemsList() {
   }
 
   const items = sortedStarredItems().map(item => `
-    <button class="search-result-item" data-index="${item.index}">
-      <div class="search-result-head">${escapeHtml(item.skandhamu)} – ${escapeHtml(item.ghattamu)} – ${escapeHtml(item.pasam)}</div>
-      <div class="search-result-snippet">${escapeHtml(item.snippet)}</div>
-    </button>
+    <div class="gem-row">
+      <button class="search-result-item gem-nav-btn" data-index="${item.index}">
+        <div class="search-result-head">${escapeHtml(item.skandhamu)} – ${escapeHtml(item.ghattamu)} – ${escapeHtml(item.pasam)}</div>
+        <div class="search-result-snippet">${escapeHtml(item.snippet)}</div>
+      </button>
+      <button class="gem-delete-btn" data-key="${escapeHtml(item.key)}" aria-label="Delete">🗑</button>
+    </div>
     <hr class="search-result-divider">
   `).join("");
 
   container.innerHTML = items;
 
-  container.querySelectorAll(".search-result-item").forEach(btn => {
+  container.querySelectorAll(".gem-nav-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       exitReadAllMode();
       const index = parseInt(btn.dataset.index, 10);
@@ -332,6 +332,25 @@ function renderGemsList() {
       closeGems();
     });
   });
+
+  container.querySelectorAll(".gem-delete-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const key = btn.dataset.key;
+      starredItems = starredItems.filter(item => item.key !== key);
+      await saveMeta("starredItems", starredItems);
+      updateStarButton();
+      renderGemsList();
+    });
+  });
+}
+
+async function clearAllGems() {
+  if (!starredItems.length) return;
+  if (!confirm("అన్ని ఆణిముత్యాలు తొలగించాలా?")) return;
+  starredItems = [];
+  await saveMeta("starredItems", starredItems);
+  updateStarButton();
+  renderGemsList();
 }
 
 function openGems() {
@@ -387,50 +406,24 @@ function buildShareText(row) {
   ].join("\n");
 }
 
-function shareCurrentCardToWhatsApp() {
+async function shareCurrentCardToWhatsApp() {
   const row = data[currentIndex];
   if (!row) return;
 
-  const numberInput = prompt("WhatsApp నంబర్ (దేశ కోడ్‌తో, ఉదా: 91XXXXXXXXXX):", "");
-  if (!numberInput) return;
+  const message = buildShareText(row);
 
-  const cleanNumber = numberInput.replace(/[^0-9]/g, "");
-  if (!cleanNumber) {
-    alert("సరైన నంబర్ ఇవ్వండి.");
-    return;
+  try {
+    await navigator.clipboard.writeText(message);
+  } catch (err) {
+    // Clipboard access blocked — not fatal, WhatsApp still opens with the
+    // text pre-filled via the URL itself.
   }
 
-  const message = buildShareText(row);
-  const url = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`;
+  const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
   window.open(url, "_blank");
 }
 
-function bindCardToggles() {
-  const meaningToggle = document.getElementById("meaningToggle");
-  const bhavamToggle = document.getElementById("bhavamToggle");
-  const meaningWrap = document.getElementById("meaningWrap");
-  const bhavamWrap = document.getElementById("bhavamWrap");
 
-  if (meaningToggle && meaningWrap) {
-    meaningToggle.addEventListener("click", async () => {
-      uiPrefs.meaningExpanded = !uiPrefs.meaningExpanded;
-      meaningWrap.classList.toggle("collapsed", !uiPrefs.meaningExpanded);
-      meaningToggle.setAttribute("aria-expanded", String(uiPrefs.meaningExpanded));
-      meaningToggle.textContent = `పద్యార్థము ${uiPrefs.meaningExpanded ? "−" : "+"}`;
-      await saveMeta("uiPrefs", uiPrefs);
-    });
-  }
-
-  if (bhavamToggle && bhavamWrap) {
-    bhavamToggle.addEventListener("click", async () => {
-      uiPrefs.bhavamExpanded = !uiPrefs.bhavamExpanded;
-      bhavamWrap.classList.toggle("collapsed", !uiPrefs.bhavamExpanded);
-      bhavamToggle.setAttribute("aria-expanded", String(uiPrefs.bhavamExpanded));
-      bhavamToggle.textContent = `భావము ${uiPrefs.bhavamExpanded ? "−" : "+"}`;
-      await saveMeta("uiPrefs", uiPrefs);
-    });
-  }
-}
 
 function scrollCardBodyToTop() {
   const padyamPane = document.getElementById("padyamPane");
@@ -839,6 +832,7 @@ function initUIEvents(refreshHandler) {
   });
   document.getElementById("closeGemsBtn").addEventListener("click", closeGems);
   document.getElementById("readAllGemsBtn").addEventListener("click", startReadAllGems);
+  document.getElementById("clearGemsBtn").addEventListener("click", clearAllGems);
   document.getElementById("whatsappBtn").addEventListener("click", () => {
     closeMenu();
     shareCurrentCardToWhatsApp();

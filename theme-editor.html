@@ -273,14 +273,25 @@
     flex: 1;
   }
 
-  .m-label {
+  .m-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 10px 14px 0;
+  }
+
+  .m-tab {
+    flex: 1;
     background: var(--label-bg);
     color: var(--label-color);
-    padding: 8px 10px;
-    border-radius: 8px;
-    font-size: 13px;
+    opacity: 0.5;
+    padding: 7px 8px;
+    border-radius: 6px 6px 0 0;
+    font-size: 12px;
     font-weight: 700;
+    text-align: center;
   }
+
+  .m-tab.active { opacity: 1; }
 
   .m-meaning-text { color: var(--details-text); font-size: 13px; margin-top: 8px; line-height: 1.5; }
 
@@ -353,8 +364,11 @@
               క్షైకారంభకు, భక్త పాలన కళా సంరంభకున్...
             </div>
           </div>
+          <div class="m-tabs">
+            <div class="m-tab active">పద్యార్థము</div>
+            <div class="m-tab">భావము</div>
+          </div>
           <div class="m-details">
-            <div class="m-label">పద్యార్థము &#8722;</div>
             <p class="m-meaning-text">శ్రీ = శుభకర మైన; కైవల్య = ముక్తి; పదంబున్ = స్థితిని...</p>
           </div>
         </div>

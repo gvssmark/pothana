@@ -1,8 +1,8 @@
 const SHEET_URL = "https://script.google.com/macros/s/AKfycbwo-TtPn3DAjHSPCXDwPFerT36QyfPPvUTi7uQEvcmjJso_aWpaKefUsgx_vpJOowHUgg/exec?sheetid=1azp8o_KQvmWNLPeiRK75JBY2Hu8DMY7wJYoWX_1WdWs&sheetname=Sheet1";
 
 // TODO: replace with your deployed usage-log Web App URL (ends in /exec)
+//const USAGE_LOG_URL = "PASTE_YOUR_USAGE_LOG_EXEC_URL_HERE";
 const USAGE_LOG_URL = "https://script.google.com/macros/s/AKfycbwCInJnUidXP2-tlaF-9X8iEoCmyooNjhCFSLrauCh_pPJPtscLion32TDZ01ATi2BI/exec";
-
 async function getOrCreateDeviceId() {
   let deviceId = await getMeta("deviceId");
   if (!deviceId) {
@@ -16,6 +16,19 @@ function detectStandalone() {
   const isDisplayModeStandalone = window.matchMedia && window.matchMedia("(display-mode: standalone)").matches;
   const isIosStandalone = window.navigator && window.navigator.standalone === true;
   return (isDisplayModeStandalone || isIosStandalone) ? "yes" : "no";
+}
+
+function tryLockPortrait() {
+  try {
+    if (screen.orientation && typeof screen.orientation.lock === "function") {
+      screen.orientation.lock("portrait").catch(() => {
+        // Not supported in this context (e.g. not installed, or browser
+        // doesn't allow it) — the CSS landscape overlay covers us either way.
+      });
+    }
+  } catch (err) {
+    // Screen Orientation API not available at all — safe to ignore.
+  }
 }
 
 function detectPlatform() {
@@ -74,8 +87,7 @@ async function loadPrefs() {
   const savedPrefs = await getMeta("uiPrefs");
   if (savedPrefs) {
     uiPrefs = {
-      meaningExpanded: savedPrefs.meaningExpanded !== false,
-      bhavamExpanded: savedPrefs.bhavamExpanded !== false,
+      activeDetailTab: savedPrefs.activeDetailTab === "bhavam" ? "bhavam" : "meaning",
       fontScale: typeof savedPrefs.fontScale === "number" ? savedPrefs.fontScale : 1,
       theme: savedPrefs.theme === "temple" ? "temple" : ""
     };
@@ -149,6 +161,7 @@ async function loadFromBundledData() {
 
 window.addEventListener("load", async () => {
   initUIEvents(refreshFromServer);
+  tryLockPortrait();
   await loadPrefs();
   await checkSearchAnnouncement();
 

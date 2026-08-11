@@ -339,7 +339,11 @@ function renderGemsList() {
       starredItems = starredItems.filter(item => item.key !== key);
       await saveMeta("starredItems", starredItems);
       updateStarButton();
-      renderGemsList();
+      if (!starredItems.length) {
+        closeGems();
+      } else {
+        renderGemsList();
+      }
     });
   });
 }
@@ -350,7 +354,7 @@ async function clearAllGems() {
   starredItems = [];
   await saveMeta("starredItems", starredItems);
   updateStarButton();
-  renderGemsList();
+  closeGems();
 }
 
 function openGems() {

@@ -370,6 +370,10 @@ button {
   flex: 0 0 auto;
   width: 52px;
   height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
   border: none;
   border-radius: 50%;
   background: var(--menu-btn-gradient);

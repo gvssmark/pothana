@@ -220,9 +220,7 @@ button {
 }
 
 .padyam-pane {
-  flex: 0 1 auto;
-  min-height: 22%;
-  max-height: 30%;
+  flex: 0 1 28vh;
   overflow-y: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;

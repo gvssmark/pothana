@@ -1,0 +1,1 @@
+const USAGE_LOG_URL = "https://script.google.com/macros/s/AKfycbwCInJnUidXP2-tlaF-9X8iEoCmyooNjhCFSLrauCh_pPJPtscLion32TDZ01ATi2BI/exec";

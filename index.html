@@ -21,7 +21,7 @@
 
 <body>
 
-<header class="app-header">
+<header class="app-header glass">
 
     <div class="header-top">
 
@@ -58,7 +58,7 @@
 
 <aside
     id="sidePanel"
-    class="side-panel hidden"
+    class="side-panel glass hidden"
     aria-hidden="true">
 
     <div class="side-panel-header">
@@ -112,8 +112,8 @@
 
         <div class="theme-control">
             <div class="theme-chip-row">
-                <button id="themeManuscriptBtn" class="theme-chip active" data-theme-value="">Manuscript &amp; Gold</button>
-                <button id="themeTempleBtn" class="theme-chip" data-theme-value="temple">Deep Temple</button>
+                <button id="themeManuscriptBtn" class="theme-chip active" data-theme-value="">Golden Glass</button>
+                <button id="themeTempleBtn" class="theme-chip" data-theme-value="temple">Sky Glass</button>
             </div>
         </div>
 
@@ -159,7 +159,7 @@
 </main>
 
 
-<footer class="footer-nav">
+<footer class="footer-nav glass">
 
     <button
         id="prevBtn"
@@ -186,7 +186,7 @@
     id="splashScreen"
     class="modal-screen">
 
-    <div class="modal-card">
+    <div class="modal-card glass">
 
         <h2>స్వాగతం</h2>
 
@@ -232,7 +232,7 @@
     id="aboutScreen"
     class="modal-screen hidden">
 
-    <div class="modal-card">
+    <div class="modal-card glass">
 
         <h2>About</h2>
 
@@ -298,6 +298,17 @@
             — అక్కడ మీకు కావలసిన వ్యక్తిని ఎంచుకోవచ్చు.
         </p>
 
+        <p>
+            Search మరియు ఆణిముత్యాలు ఇప్పుడు చిన్న popup
+            విండోలుగా కనిపిస్తాయి. వాటి బయట ఎక్కడైనా
+            నొక్కితే మూసుకుపోతాయి.
+        </p>
+
+        <p>
+            మెనూలో "రూపం" కింద Golden Glass మరియు
+            Sky Glass — రెండు తేలికపాటి రూపాలు ఎంచుకోవచ్చు.
+        </p>
+
         <p style="font-size: small;">
             ఈ యాప్ వాడుకను అర్థం చేసుకోవడానికి, ఏ పేరు లేదా
             వ్యక్తిగత సమాచారం లేకుండా, కేవలం anonymous
@@ -317,9 +328,14 @@
 </section>
 
 
+<div
+    id="searchOverlay"
+    class="overlay hidden">
+</div>
+
 <section
     id="searchScreen"
-    class="search-screen hidden"
+    class="search-screen glass hidden"
     aria-hidden="true">
 
     <div class="search-screen-header">
@@ -372,9 +388,14 @@
 </section>
 
 
+<div
+    id="gemsOverlay"
+    class="overlay hidden">
+</div>
+
 <section
     id="gemsScreen"
-    class="search-screen hidden"
+    class="search-screen glass hidden"
     aria-hidden="true">
 
     <div class="search-screen-header">

@@ -1,53 +1,86 @@
 :root {
   --font-scale: 1;
 
+  /* Page background + floating orbs — Golden Glass */
+  --bg-gradient:
+    radial-gradient(900px 500px at 10% 0%, #ffe0b0 0%, transparent 60%),
+    radial-gradient(800px 600px at 90% 10%, #ffd0d8 0%, transparent 60%),
+    radial-gradient(900px 700px at 50% 100%, #fff3d6 0%, transparent 65%),
+    linear-gradient(160deg, #fff8ec 0%, #fdf1e2 50%, #fbe9dc 100%);
+  --orb-1: radial-gradient(circle at 30% 30%, #ffcf87, transparent 70%);
+  --orb-2: radial-gradient(circle at 30% 30%, #ffb4c6, transparent 70%);
+
   --page-bg: #fdf6e3;
   --text-primary: #3a1f10;
 
-  --header-bg: #5c1a1a;
-  --header-border-bottom: none;
-  --header-title: #f3d98d;
-  --header-icon: #e8c88a;
-  --header-skanda: #e26a6a;
-  --header-ghatta: #e8c88a;
+  /* Glass chrome (header, footer, menu, modals) */
+  --glass-blur: 18px;
+  --glass-fill: rgba(255, 250, 240, 0.55);
+  --glass-fill-hover: rgba(255, 250, 240, 0.75);
+  --glass-border: rgba(255, 255, 255, 0.85);
+  --glass-shadow: rgba(120, 70, 40, 0.18);
+  --glass-text: #4a2c1a;
+  --menu-btn-gradient: linear-gradient(135deg, rgba(255, 145, 110, 0.55), rgba(255, 205, 120, 0.5));
+  --menu-btn-gradient-hover: linear-gradient(135deg, rgba(255, 145, 110, 0.7), rgba(255, 205, 120, 0.65));
 
-  --surface-bg: #fffdf7;
+  --header-title: #7a2f1a;
+  --header-icon: #7a2f1a;
+  --header-skanda: #c0392b;
+  --header-ghatta: #8a5a2f;
+
+  --surface-bg: #fffdf9;
   --padyam-bg: #fbeed2;
-  --ring-color: #c9a227;
-  --ring-soft: #e6d3a3;
+  --ring-color: #d9a441;
+  --ring-soft: #ecd9ae;
 
-  --label-bg: #5c1a1a;
-  --label-color: #f3d98d;
+  --label-bg: #7a2f1a;
+  --label-color: #f8e6c8;
 
-  --accent-strong: #5c1a1a;
-  --accent-on-strong: #f3d98d;
-  --accent-strong-disabled: #a9776f;
+  --accent-strong: #8c3a1f;
+  --accent-on-strong: #fff6e8;
+  --accent-strong-disabled: #d3ab8f;
 
   --details-text: #4a2c1a;
 }
 
 [data-theme="temple"] {
-  --page-bg: #f6f1e4;
-  --text-primary: #2b1010;
+  /* Page background + floating orbs — Sky Glass */
+  --bg-gradient:
+    radial-gradient(900px 500px at 10% 0%, #bfe3ff 0%, transparent 60%),
+    radial-gradient(800px 600px at 90% 10%, #d8caff 0%, transparent 60%),
+    radial-gradient(900px 700px at 50% 100%, #c9f5e8 0%, transparent 65%),
+    linear-gradient(160deg, #f2f9ff 0%, #edf3ff 50%, #eafaf5 100%);
+  --orb-1: radial-gradient(circle at 30% 30%, #8fd0ff, transparent 70%);
+  --orb-2: radial-gradient(circle at 30% 30%, #b8f2df, transparent 70%);
 
-  --header-bg: #2b1010;
-  --header-border-bottom: 2px solid #c9a227;
-  --header-title: #d4af37;
-  --header-icon: #d4af37;
-  --header-skanda: #ef8080;
-  --header-ghatta: #cbb98a;
+  --page-bg: #eef5fb;
+  --text-primary: #1f2a3d;
 
-  --surface-bg: #fffdf7;
-  --padyam-bg: #fdf8ec;
-  --ring-color: #c9a227;
-  --ring-soft: #e9e0c8;
+  --glass-blur: 18px;
+  --glass-fill: rgba(245, 250, 255, 0.55);
+  --glass-fill-hover: rgba(245, 250, 255, 0.78);
+  --glass-border: rgba(255, 255, 255, 0.85);
+  --glass-shadow: rgba(40, 60, 100, 0.15);
+  --glass-text: #22314f;
+  --menu-btn-gradient: linear-gradient(135deg, rgba(110, 160, 255, 0.5), rgba(120, 220, 200, 0.5));
+  --menu-btn-gradient-hover: linear-gradient(135deg, rgba(110, 160, 255, 0.68), rgba(120, 220, 200, 0.65));
 
-  --label-bg: #2b1010;
-  --label-color: #d4af37;
+  --header-title: #24405c;
+  --header-icon: #24405c;
+  --header-skanda: #c0526b;
+  --header-ghatta: #3c6e63;
 
-  --accent-strong: #2b1010;
-  --accent-on-strong: #d4af37;
-  --accent-strong-disabled: #6b4a42;
+  --surface-bg: #fdfeff;
+  --padyam-bg: #eef6ff;
+  --ring-color: #7fa9d6;
+  --ring-soft: #cfe1f2;
 
-  --details-text: #3a281f;
+  --label-bg: #24405c;
+  --label-color: #eaf2ff;
+
+  --accent-strong: #2c4c73;
+  --accent-on-strong: #f2f8ff;
+  --accent-strong-disabled: #a9bccf;
+
+  --details-text: #22314f;
 }

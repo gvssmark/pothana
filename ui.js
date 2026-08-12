@@ -358,12 +358,14 @@ async function clearAllGems() {
 }
 
 function openGems() {
+  document.getElementById("gemsOverlay").classList.remove("hidden");
   document.getElementById("gemsScreen").classList.remove("hidden");
   document.getElementById("gemsScreen").setAttribute("aria-hidden", "false");
   renderGemsList();
 }
 
 function closeGems() {
+  document.getElementById("gemsOverlay").classList.add("hidden");
   document.getElementById("gemsScreen").classList.add("hidden");
   document.getElementById("gemsScreen").setAttribute("aria-hidden", "true");
 }
@@ -738,6 +740,7 @@ async function restoreSearchState() {
 }
 
 function openSearch() {
+  document.getElementById("searchOverlay").classList.remove("hidden");
   document.getElementById("searchScreen").classList.remove("hidden");
   document.getElementById("searchScreen").setAttribute("aria-hidden", "false");
 
@@ -750,6 +753,7 @@ function openSearch() {
 }
 
 function closeSearch() {
+  document.getElementById("searchOverlay").classList.add("hidden");
   document.getElementById("searchScreen").classList.add("hidden");
   document.getElementById("searchScreen").setAttribute("aria-hidden", "true");
 }
@@ -818,6 +822,7 @@ function initUIEvents(refreshHandler) {
   document.getElementById("startBtn").addEventListener("click", hideSplash);
   document.getElementById("searchBtn").addEventListener("click", openSearch);
   document.getElementById("closeSearchBtn").addEventListener("click", closeSearch);
+  document.getElementById("searchOverlay").addEventListener("click", closeSearch);
   document.getElementById("clearSearchBtn").addEventListener("click", clearSearch);
   document.getElementById("searchInput").addEventListener("input", onSearchInput);
   bindSearchScopeChips();
@@ -835,6 +840,7 @@ function initUIEvents(refreshHandler) {
     openGems();
   });
   document.getElementById("closeGemsBtn").addEventListener("click", closeGems);
+  document.getElementById("gemsOverlay").addEventListener("click", closeGems);
   document.getElementById("readAllGemsBtn").addEventListener("click", startReadAllGems);
   document.getElementById("clearGemsBtn").addEventListener("click", clearAllGems);
   document.getElementById("whatsappBtn").addEventListener("click", () => {

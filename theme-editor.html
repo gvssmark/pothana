@@ -371,7 +371,7 @@
   <div id="manifestReminder" class="hidden">
     <h3>⚠️ Also update manifest.json</h3>
     <p style="margin:0;">
-      "Page bg" and "Solid buttons" also control the Android
+      "Page bg" also controls the Android
       status bar and app-launch splash screen — those come from
       <code>manifest.json</code>, not <code>theme.css</code>. Paste this in
       after downloading:
@@ -467,7 +467,7 @@ const DEFAULTS = {
 let current = { manuscript: { ...DEFAULTS.manuscript }, temple: { ...DEFAULTS.temple } };
 let activeTheme = "manuscript";
 const mockupScreen = document.querySelector("#mockup .screen");
-const MANIFEST_LINKED_KEYS = ["--page-bg", "--accent-strong"];
+const MANIFEST_LINKED_KEYS = ["--page-bg"];
 
 function applyPreview() {
   const values = current[activeTheme];
@@ -486,9 +486,8 @@ function updateManifestReminder() {
 
   reminder.classList.remove("hidden");
   const pageBg = current.manuscript["--page-bg"];
-  const accentColor = current.manuscript["--accent-strong"];
   document.getElementById("manifestSnippet").value =
-    `"background_color": "${pageBg}",\n"theme_color": "${accentColor}"`;
+    `"background_color": "${pageBg}",\n"theme_color": "${pageBg}"`;
 }
 
 function renderControls() {

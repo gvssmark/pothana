@@ -25,6 +25,8 @@ function applyFontScale() {
   const incBtn = document.getElementById("fontIncreaseBtn");
   if (decBtn) decBtn.disabled = uiPrefs.fontScale <= FONT_SCALE_MIN;
   if (incBtn) incBtn.disabled = uiPrefs.fontScale >= FONT_SCALE_MAX;
+
+  updatePadyamScrollHint();
 }
 
 async function stepFontSize(delta) {
@@ -42,7 +44,7 @@ function applyTheme() {
   }
 
   const themeMeta = document.querySelector('meta[name="theme-color"]');
-  if (themeMeta) themeMeta.setAttribute("content", uiPrefs.theme === "temple" ? "#2b1010" : "#5c1a1a");
+  if (themeMeta) themeMeta.setAttribute("content", uiPrefs.theme === "temple" ? "#eef5fb" : "#fdf6e3");
 
   document.querySelectorAll(".theme-chip").forEach(chip => {
     chip.classList.toggle("active", chip.dataset.themeValue === uiPrefs.theme);
@@ -142,6 +144,7 @@ function renderCard(row) {
       <div id="padyamPane" class="padyam-pane">
         <button id="starBtn" class="star-btn" aria-label="Star this padyam">☆</button>
         ${padyamHtml}
+        <div id="padyamScrollHint" class="padyam-scroll-hint hidden">⌄ మరింత చదవండి</div>
       </div>
       <div id="detailTabs" class="detail-tabs">
         <button class="detail-tab ${uiPrefs.activeDetailTab === "meaning" ? "active" : ""}" id="meaningTab" data-tab="meaning">పద్యార్థము</button>
@@ -159,6 +162,15 @@ function renderCard(row) {
   bindDetailsSwipe();
   bindStarButton();
   scrollCardBodyToTop();
+  updatePadyamScrollHint();
+}
+
+function updatePadyamScrollHint() {
+  const pane = document.getElementById("padyamPane");
+  const hint = document.getElementById("padyamScrollHint");
+  if (!pane || !hint) return;
+  const hasOverflow = pane.scrollHeight > pane.clientHeight + 2;
+  hint.classList.toggle("hidden", !hasOverflow);
 }
 
 function updateHeaderContext(row, titlePasam) {

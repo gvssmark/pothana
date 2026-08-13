@@ -219,14 +219,32 @@ button {
   flex: 1;
 }
 
+.padyam-scroll-hint {
+  position: sticky;
+  bottom: -10px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent-strong);
+  background: linear-gradient(to bottom, transparent, var(--surface-bg) 60%);
+  padding: 18px 4px 4px;
+  margin-top: -18px;
+  pointer-events: none;
+}
+
 .padyam-pane {
-  flex: 0 1 28vh;
+  flex: 0 1 32vh;
   overflow-y: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
   padding: 10px;
   border-bottom: 1px solid var(--ring-soft);
   position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: safe center;
   animation: padyamDissolveIn 0.32s ease;
 }
 

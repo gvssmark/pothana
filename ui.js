@@ -438,7 +438,11 @@ async function shareCurrentCardToWhatsApp() {
   }
 
   const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
-  window.open(url, "_blank");
+  // Direct navigation, not window.open() — inside an installed/standalone
+  // PWA, window.open() often fails to hand off to WhatsApp properly
+  // (blank tab on iOS, and can leave a stray browser context behind that
+  // "Back"/swipe-up lands on instead of returning to the phone/app list).
+  window.location.href = url;
 }
 
 
